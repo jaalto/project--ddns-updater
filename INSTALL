@@ -4,12 +4,13 @@ Requires
    Standard POSIX /bin/sh
    curl(1) client
 
-To install the program for system wide use:
+To install (as root)
 
-   make help
-   make install
+   install -m 755 ddns-duckdns.sh /usr/local/bin/ddns-duckdns
+   mkdir -p ~/.duckdns
 
-To run run "in place" under $HOME/.duckdns without installation:
+   # Copy TOKEN from your account page
+   # DOMAIN.duckdns.org
 
-   make install-home
-
+   echo TOKEN > ~/.duckdns/token
+   echo DOMAIN > ~/.duckdns/domain
