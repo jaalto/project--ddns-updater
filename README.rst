@@ -16,14 +16,14 @@ has changed and sends an update request.
 
 1. Create a user account
 
-2. Add domain to your account
+2. Add domain(s) to your account
 
 3. Copy the TOKEN from your account
 
 4. Configure update interval in cronjob
 
-  crontab -e
-  */30 * * * * ddns-duckdns.sh
+    crontab -e
+    */30 * * * * ddns-duckdns.sh
 
 After these steps, the script is ready to use.
 
@@ -31,7 +31,7 @@ Call it once from command line to seed the initial IP. To check for
 probelems, run it under the shell debugging option ``-x`` to see if there
 are any probelms.
 
-  sh -x /<path to>/ddns-duckdns.sh
+    sh -x /<path to>/ddns-duckdns.sh
 
 REQUIREMENTS
 ============
