@@ -8,7 +8,8 @@ VERSION="2019.0708.0220"
 LICENSE="GPL-2+"
 
 CONF=$HOME/.duckdns
-DOMAINS=$(sed -e 's/[ \t]*//' $CONF/domain) 
+DOMFILE=$CONF/domains
+DOMAINS=$(sed -e 's/[ \t]*//' $DOMFILE) 
 TOKEN=$(cat $CONF/token)
 LOG=$CONF/log
 IP_FILE=$CONF/ip
@@ -29,7 +30,7 @@ OPTIONS
 FILES
   These files must exist:
 
-  $CONF/domain   comma separated list of the subnames
+  $CONF/domains  Comma separated list of the subnames
   $CONF/token    The token of account (see your profile)"
 
 Version ()
@@ -116,11 +117,11 @@ Main ()
     fi
     
     if [ ! "$DOMAINS" ]; then
-	Die "ERROR: No domains in: $CONF/domain"
+	Die "ERROR: No domains in: $DOMFILE"
     fi
 
-    if grep "\." $CONF/domain ; then
-	Die "ERROR: FQDN names not allowed, only subdomains names in: $CONF/domain"
+    if grep "\." $DOMFILE ; then
+	Die "ERROR: FQDN names not allowed, only subdomains names in: $DOMFILE"
     fi
     
     if [ ! "$TOKEN" ] ; then
