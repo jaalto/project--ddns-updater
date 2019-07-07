@@ -40,7 +40,7 @@ REQUIREMENTS
 INSTALL
 =======
 
-See separate file INSTALL.
+See details in separate INSTALL file.
 
 REFERENCES
 ==========
