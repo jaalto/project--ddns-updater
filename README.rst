@@ -20,20 +20,20 @@ has changed and sends an update request.
 
 3. Copy the TOKEN from your account.
 
-4. Configure update interval in cronjob.
+4. Configure update interval in a cronjob.
 
 After these steps, the script is ready to use.
 
 Call it once from command line to seed the initial IP. To check for
-probelems, run it under the shell debugging option ``-x`` to see if there
-are any probelms. ::
+problems, run it under the shell debugging option ``-x`` to see internals
+working:
 
     sh -x /<path to>/ddns-duckdns.sh
 
 REQUIREMENTS
 ============
 
-1. Environment: any POSIX environment
+1. POSIX environment and utilities
 
 2. POSIX ``/bin/sh`` and ``curl(1)`` client.
 
