@@ -10,7 +10,10 @@ To install (as root)
    mkdir -p ~/.duckdns
 
    # Copy TOKEN from your account page
-   # DOMAIN.duckdns.org
+   # SUBDOMAIN.duckdns.org
 
    echo TOKEN > ~/.duckdns/token
-   echo DOMAIN > ~/.duckdns/domain
+   echo SUBDOMAIN,SUBDOMAIN... > ~/.duckdns/domains
+
+   crontab -e
+   */30 * * * * ddns-duckdns.sh
