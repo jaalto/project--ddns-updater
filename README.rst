@@ -14,16 +14,13 @@ How does it work?
 Based on your domains and credentials, it periodically checks if IP address
 has changed and sends an update request.
 
-1. Create a user account
+1. Create a user account.
 
-2. Add domain(s) to your account
+2. Add domain(s) to your account.
 
-3. Copy the TOKEN from your account
+3. Copy the TOKEN from your account.
 
-4. Configure update interval in cronjob ::
-
-    crontab -e
-    */30 * * * * ddns-duckdns.sh
+4. Configure update interval in cronjob.
 
 After these steps, the script is ready to use.
 
