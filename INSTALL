@@ -1,0 +1,15 @@
+Requires
+
+   POSIX environment
+   Standard POSIX /bin/sh
+   curl(1) client
+
+To install the program for system wide use:
+
+   make help
+   make install
+
+To run run "in place" under $HOME/.duckdns without installation:
+
+   make install-home
+
