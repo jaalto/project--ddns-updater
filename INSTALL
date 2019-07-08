@@ -4,6 +4,14 @@ Requires
    Standard POSIX /bin/sh
    curl(1) client
 
+   Perl - only on system wide install with manual pages
+
+SYSTEM WIDE
+
+   make install
+
+MANUAL INSTALL
+
 To install (as root)
 
    # Install without the *.sh extension.
