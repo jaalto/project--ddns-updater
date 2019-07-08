@@ -14,15 +14,22 @@ To install (as root)
 
    mkdir --parents ~/.config/ddns-updater
 
+Note:
+
+  The configuration files can be installed in:
+
+      $HOME/.config/ddns-updater/	   or
+      /etc/ddns-updater/
+
 Configure for ducdns.org
 
    # Copy TOKEN from your account page
    # SUBDOMAIN.duckdns.org
 
-   echo TOKEN > ~/.config/ddns-updater/duckdns.token
-   echo SUBDOMAIN,SUBDOMAIN... > ~/.config/ddns-updater/duckdns.domains
+   echo TOKEN > $HOME/.config/ddns-updater/duckdns.token
+   echo SUBDOMAIN,SUBDOMAIN... > $HOME/.config/ddns-updater/duckdns.domains
 
 Configure for dns.he.net
 
-   echo PASSWORD > ~/.config/ddns-updater/henet.pass
-   echo SUBDOMAIN,SUBDOMAIN... >  ~/.config/ddns-updater/henet.domains
+   echo PASSWORD > $HOME/.config/ddns-updater/henet.pass
+   echo SUBDOMAIN,SUBDOMAIN... >  $HOME/.config/ddns-updater/henet.domains
