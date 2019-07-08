@@ -2,7 +2,7 @@ Requires
 
    POSIX environment
    Standard POSIX /bin/sh
-   curl(1) client
+   Some web client: curl | wget | lynx
 
    Perl - only on system wide install with manual pages
 
