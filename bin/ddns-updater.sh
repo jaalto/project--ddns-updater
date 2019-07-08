@@ -26,7 +26,7 @@
 #       See --help. Configuration files must exist before use.
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0708.1553"
+VERSION="2019.0708.1609"
 LICENSE="GPL-2+"
 
 # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -99,7 +99,7 @@ HENET_FILE_LOG=$CONF/henet.log
 FILE_IP=$CONF/00.ip
 FILE_TIMESTAMP=$CONF/00.updated
 MSG_PREFIX="[DDNS-UPDATER] "
-CURL_OPTS="--max-time=10"
+CURL_OPTS="--max-time 10"
 WGET_OPTS=
 
 Version ()
