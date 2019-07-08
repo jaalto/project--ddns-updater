@@ -5,10 +5,10 @@
 DESCRIPTION
 ===========
 
-A shell program to update IP address[1] to services:
+A shell program to update IP address to services:
 
-    http://duckdns.org
-    http://dns.he.net
+    http://duckdns.org [1]
+    http://dns.he.net  [2]
 
 You need account and domains from one of the services services.
 
@@ -26,11 +26,10 @@ has changed and sends an update request.
 
 4. Configure update interval for a cronjob.
 
-Call program once from command line to seed the initial IP. To check for
-problems, run it under the shell debugging option ``-x`` to see internals
-working:
+After setting up configuration files, call program once from command
+line to seed the initial IP. After that cron takes care of updates. ::
 
-    sh -x /<path to>/ddns-duckdns.sh
+    /usr/local/bin/ddns-updater --verbose
 
 REQUIREMENTS
 ============
@@ -47,7 +46,8 @@ See details in separate INSTALL file.
 REFERENCES
 ==========
 
-[1] https://www.duckdns.org/spec.jsp
+[1] Free DDNS hosting at https://www.duckdns.org/spec.jsp
+[2] Hurricane Electric Free DDNS hosting in Europe. https://dns.he.net
 
 COPYRIGHT AND LICENSE
 =====================
