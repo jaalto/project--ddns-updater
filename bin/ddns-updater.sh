@@ -26,7 +26,7 @@
 #       See --help. Configuration files must exist before use.
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0708.1306"
+VERSION="2019.0708.1330"
 LICENSE="GPL-2+"
 
 # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -99,20 +99,26 @@ HENET_FILE_LOG=$CONF/henet.log
 # Use prefix 00.* to make data files to appear first in ls(1)
 FILE_IP=$CONF/00.ip
 FILE_TIMESTAMP=$CONF/00.updated
+MSG_PREFIX="[DDNS-UPDATER] "
 
 Version ()
 {
     echo "$VERSION $LICENSE $AUTHOR $HOMEPAGE"
 }
 
-Echo ()
+Verbose ()
 {
-    [ "$VERBOSE" ] && echo "$*"
+    [ "$VERBOSE" ] && echo "$MSG_PREFIX$*"
+}
+
+Msg ()
+{
+    echo "$MSG_PREFIX$*"
 }
 
 Warn ()
 {
-    echo "$*" >&2
+    Msg "$*" >&2
 }
 
 Die ()
@@ -126,7 +132,7 @@ Date ()
     date "+%Y-%m-%d %H:%M"
 }
 
-OldIP ()
+IpPrevious ()
 {
     cat $FILE_IP 2> /dev/null
 }
@@ -164,7 +170,7 @@ Webcall ()
     fi
 }
 
-CurrentIP ()
+IpCurrent ()
 {
     if [ "$TEST" ]; then
         echo "0.0.0.0"
@@ -226,7 +232,7 @@ Duckdns ()
 
     url="https://www.duckdns.org/update?domains=$domains&token=$token&ip=$ip$DUCKDNS_URI_VERBOSE"
 
-    Echo "Info: Updating Duckdns..."
+    Verbose "Info: Updating Duckdns..."
     Webcall "$DUCKDNS_LOG" "$url"
 
     # Add missing last NEWLINE
@@ -237,7 +243,7 @@ Duckdns ()
         sed '/^[ \t]*$/d' $DUCKDNS_FILE_LOG
     fi
 
-    Echo "Info: Updating Duckdns...done"
+    Verbose "Info: Updating Duckdns...done"
 }
 
 Main ()
@@ -257,7 +263,7 @@ Main ()
                 ;;
             -t | --test | --dry-run)
                 shift
-                echo "** Running in test mode, no network calls"
+                Msg "** Running in test mode, no network calls"
                 VERBOSE=verbose
                 TEST=test
                 ;;
@@ -294,11 +300,15 @@ Main ()
         Die "ERROR: No configuration directory: $CONF"
     fi
 
-    ip_old=$(OldIP)
-    ip=$(CurrentIP)
+    ip_prev=$(IpPrevious)
+    ip=$(IpCurrent)
 
-    Echo "IP old: $ip_old"
-    Echo "IP now: $ip"
+    Verbose "IP old: $ip_prev"
+    Verbose "IP now: $ip"
+
+    if [ ! "$ip" ] || [ "$ip" = "0.0.0.0" ] ; then
+        Warn "WARN: current IP address not available"
+    fi
 
     if [ "$status" ]; then
         date=$(cat $FILE_TIMESTAMP 2> /dev/null)
@@ -308,27 +318,32 @@ Main ()
             str=" Updated: UNKNOWN (timestamp not available until next update)"
         fi
 
-        if [ "$ip_old" = "$ip" ]; then
-            echo "OK IP: $ip (update not needed)$str"
+        if [ "$ip_prev" = "$ip" ]; then
+            Msg "OK IP: $ip (update not needed)$str"
         else
-            if ["$ip_old" ]; then
-                ip_old="was $ip_old"
+            if [ "$ip_prev" ]; then
+                ip_prev="was $ip_prev"
             else
-                ip_old="old ip UNKNOWN"
+                ip_prev="previous IP UNKNOWN"
             fi
 
-            echo "NOK IP: '$ip' (update needed, $old_ip).$str"
+            Msg "NOK IP: '$ip' (update needed, $ip_prev).$str"
         fi
 
         return 0
     fi
 
-    if [ ! "$FORCE" ] && [ "$ip_old" = "$ip" ]; then
-        Echo "Info: Nothing to update"
+    if [ ! "$FORCE" ] && [ "$ip_prev" = "$ip" ]; then
+        Verbose "Info: Nothing to update"
         return 0
     else
-        echo $ip > $FILE_IP
-        Date > $FILE_TIMESTAMP
+
+        if [ ! "$ip" ] && [ ! "$TEST" ]; then
+            Die "WARN: Cannot update. Current IP address not available"
+        fi
+
+        [ "$TEST" ] || echo $ip > $FILE_IP
+        [ "$TEST" ] || Date > $FILE_TIMESTAMP
 
         done=
         status=0
