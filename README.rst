@@ -10,7 +10,7 @@ A shell program to update IP address to Dynamic DNS (DDNS) services:
 - http://duckdns.org [1]
 - http://dns.he.net  [2]
 
-You need account and domains from one of the services services.
+You need an account and domains from one of the services.
 
 How does it work?
 -----------------
@@ -24,7 +24,7 @@ has changed and sends an update request.
 
 3. Copy the TOKEN or PASSWORD from your account depending on used DDNS service.
 
-4. Configure update interval for a cronjob.
+4. Configure update interval for a cron job.
 
 After setting up configuration files, call program once from command
 line to seed the initial IP. After that cron takes care of updates. ::
