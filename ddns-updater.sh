@@ -26,43 +26,11 @@
 #       See --help. Configuration files must exist before use.
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0708.1118"
+VERSION="2019.0708.1154"
 LICENSE="GPL-2+"
 
-HELP="\
-Synopsis: $0 [option]
-
-DESCRIPTION
-  Updates IP address to service duckdns.org
-
-OPTIONS
-  -f, --force    Force update even if IP is same.
-  -s, --status   Show status and exit.
-  -t, --test     Run in test mode. No real update.
-  -v, --verbose  Display verbose output.
-  -V, --version  Display version information and exit.
-  -h, --help     Display short help.
-
-  Please note that stacking of short options is not supported. E.g.
-  -v -f cannot be combined into -vf.
-
-FILES
-  User configuration files:
-
-  # For duckdns.org
-  $CONF/duckdns.domains  Comma separated list of the subnames (not FQDN)
-  $CONF/duckdns.token    The token of account (see your profile)
-
-  # For dns.he.org
-  $CONF/henet.domains    Comma separated list of the subnames
-  $CONF/henet.pass       The account password
-
-  Internal house keeping files:
-
-  00.ip                  Current ip
-  00.updated             contains YYYY-MM-DD HH:MM of last update"
-
 # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+
 if [ "$XDG_CONFIG_HOME" ]; then
     CONFHOME=$XDG_CONFIG_HOME/ddns-updater
 else
@@ -77,6 +45,47 @@ do
         CONF=$dir
     fi
 done
+
+HELP="\
+Synopsis: $0 [option]
+
+DESCRIPTION
+  Updates IP address to DDNS services: duckdns.org and
+  dns.he.net
+
+OPTIONS
+  -f, --force    Force update even if IP is same.
+  -s, --status   Show status and exit.
+  -t, --test     Run in test mode. No real update.
+  -v, --verbose  Display verbose output.
+  -V, --version  Display version information and exit.
+  -h, --help     Display short help.
+
+  Please note that stacking of short options is not supported. E.g.
+  -v -f cannot be combined into -vf.
+
+DIRECTORIES
+
+  CONFDIR Configuration directories searched in order:
+
+  \$HOME/.config/ddns-updater/
+  /etc/ddns-updater/
+
+FILES
+  Configuration files:
+
+  # For duckdns.org
+  $CONF/duckdns.domains  Comma separated list of the subnames (not FQDN)
+  $CONF/duckdns.token    The token of account (see your profile)
+
+  # For dns.he.org
+  $CONF/henet.domains    Comma separated list of the subnames
+  $CONF/henet.pass       The account password
+
+  Internal house keeping files:
+
+  00.ip                  Current ip
+  00.updated             contains YYYY-MM-DD HH:MM of last update"
 
 DUCKDNS_FILE_DOMAINS=$CONF/duckdns.domains
 DUCKDNS_FILE_TOKEN=$CONF/duckdns.token
@@ -125,6 +134,11 @@ OldIP ()
 CurrentIP ()
 {
     curl --silent ifconfig.co
+}
+
+Help ()
+{
+    echo "$HELP" | sed "s,$HOME,~,g"
 }
 
 IsHenet ()
@@ -226,7 +240,7 @@ Main ()
                 ;;
             -h | --help)
                 shift
-                echo "$HELP"
+                Help
                 return 0
                 ;;
             -*) Warn "WARN: Unknown option: $1"
