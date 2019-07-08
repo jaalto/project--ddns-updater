@@ -1,1 +1,1 @@
-*/30 * * * * ddns-updater > /dev/null 2>&1
+*/30 * * * * ddns-updater
