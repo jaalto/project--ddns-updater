@@ -5,8 +5,12 @@
 DESCRIPTION
 ===========
 
-Utility to update IP address[1] to service http://duckdns.org
-You need account and domains from the service.
+A shell program to update IP address[1] to services:
+
+    http://duckdns.org
+    http://dns.he.net
+
+You need account and domains from one of the services services.
 
 How does it work?
 -----------------
@@ -18,13 +22,11 @@ has changed and sends an update request.
 
 2. Add domain(s) to your account.
 
-3. Copy the TOKEN from your account.
+3. Copy the TOKEN or PASSWORD from your account depending on used DDNS service.
 
-4. Configure update interval in a cronjob.
+4. Configure update interval for a cronjob.
 
-After these steps, the script is ready to use.
-
-Call it once from command line to seed the initial IP. To check for
+Call program once from command line to seed the initial IP. To check for
 problems, run it under the shell debugging option ``-x`` to see internals
 working:
 
@@ -33,7 +35,7 @@ working:
 REQUIREMENTS
 ============
 
-1. POSIX environment and utilities
+1. POSIX environment and standard utilities (grep, awk...)
 
 2. POSIX ``/bin/sh`` and ``curl(1)`` client.
 
