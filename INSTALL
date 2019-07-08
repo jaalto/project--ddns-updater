@@ -6,12 +6,18 @@ Requires
 
 To install (as root)
 
-   install -m 755 ddns-duckdns.sh /usr/local/bin/ddns-duckdns
-   install -m 644 cron.d/ddns-duckdns /etc/cron.d/
+   # Install without the *.sh extension.
+   # System wide programs dont use extensions.
 
-   mkdir -p ~/.duckdns
+   install -m 755 ddns-updater.sh /usr/local/bin/ddns-updater
+   install -m 644 cron.d/ddns-updater /etc/cron.d/
+
+   mkdir -p ~/.ddns-updater
+
+Configure for ducdns.org
 
    # Copy TOKEN from your account page
-   # SUBDOMAIN.duckdns.org
-   echo TOKEN > ~/.duckdns/token
-   echo SUBDOMAIN,SUBDOMAIN... > ~/.duckdns/domains
+   # SUBDOMAIN.ddns-updater.org
+
+   echo TOKEN > ~/.ddns-updater/duckdns.token
+   echo SUBDOMAIN,SUBDOMAIN... > ~/.ddns-updater/duckdns.domains
