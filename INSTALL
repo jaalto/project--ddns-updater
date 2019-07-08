@@ -29,17 +29,7 @@ Note:
       $HOME/.config/ddns-updater/	   or
       /etc/ddns-updater/
 
-Configure for duckdns.org
+Configuration templates:
 
-   # Copy TOKEN from your account page
-   # SUBDOMAIN.duckdns.org
-
-   $HOME/.config/ddns-updater/duckdns.conf
-   DUCKDNS_TOKEN=token-string-here
-   DUCKDNS_DOMAINS=subdomain,subdomain...
-
-Configure for dns.he.net
-
-   $HOME/.config/ddns-updater/henet.conf
-   DUCKDNS_PASS=password
-   DUCKDNS_DOMAINS=host.example.com
+   # Edit files after copying
+   cp conf/*.conf $HOME/.config/ddns-updater/
