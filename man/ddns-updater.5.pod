@@ -1,0 +1,149 @@
+#   Copyright
+#
+#	Copyright (C) 2019 Jari Aalto
+#
+#   License
+#
+#       This program is free software; you can redistribute it and/or modify
+#       it under the terms of the GNU General Public License as published by
+#       the Free Software Foundation; either version 2 of the License, or
+#       (at your option) any later version.
+#
+#       This program is distributed in the hope that it will be useful,
+#       but WITHOUT ANY WARRANTY; without even the implied warranty of
+#       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#       GNU General Public License for more details.
+#
+#       You should have received a copy of the GNU General Public License
+#       along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+#   Description
+#
+#	To learn what TOP LEVEL sections to use in manual pages,
+#	see POSIX/Susv standard and "Utility Description Defaults" at
+#	http://www.opengroup.org/onlinepubs/009695399/utilities/xcu_chap01.html#tag_01_11
+#
+#	This manual page in Perl POD format. Read more at
+#	http://perldoc.perl.org/perlpod.html or run command:
+#
+#	    perldoc perlpod
+#
+#	To check the syntax:
+#
+#	    podchecker *.pod
+#
+#	To create manual:
+#
+#	    pod2man FILE.N.pod > FILE.N
+
+=pod
+
+=head1 NAME
+
+ddnd-updater - dynamic DNS (DDNS) update client
+
+=head1 SYNOPSIS
+
+  ddns-updater [options]
+
+=head1 DESCRIPTION
+
+Program updates IP address to following services, provided that
+configuration files are set:
+
+  http://duckdns.org
+  http://dns.he.net
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-f, --force>
+
+Force update even if IP is same.
+
+=item B<-s, --status>
+
+Show status and exit.
+
+=item B<-t, --test, --dry-run>
+
+Run in test mode. No network update.
+
+=item B<-v, --verbose>
+
+Display verbose messages.
+
+=item B<-V, --Verson>
+
+Display version information and exit.
+
+=item B<-h, --help>
+
+Display short help.
+
+=back
+
+=head1 EXAMPLES
+
+Update and show progress:
+
+    ddns-updater --verbose
+
+Show status, is update needed?
+
+    ddns-updater --status
+
+=head1 BUGS
+
+The program does not use non-POSIX featues like getopt(1) to parse
+options. Due to lack of proper programing language constructs in POSIX
+shell, combining short options in form of B<-vf> is not supported. Use
+separate options like in B<-f> B<-i>.
+
+=head1 ENVIRONMENT
+
+POSIX
+
+=head1 FILES
+
+The C<$CONF> refers to configuration directory. Search order:
+
+  $HOME/.config/ddns-updater
+  /etc/ddns-updater
+
+Configuration files for duckdns.org
+  $CONF/duckdns.domains  Comma separated list of the subnames (not FQDN)
+  $CONF/duckdns.token    The token of account (see your profile)
+
+Configuration files for dns.he.net
+
+  $CONF/henet.domains    Comma separated list of the subnames
+  $CONF/henet.pass       The account password
+
+Internal house keeping files:
+
+  $CONF/00.ip            Current ip
+  $CONF/00.updated       contains YYYY-MM-DD HH:MM of last update"
+
+=head1 STANDARDS
+
+None.
+
+=head1 AVAILABILITY
+
+https://github.com/jaalto/project--ddns-updater
+
+=head1 SEE ALSO
+
+ddclient(1)
+
+=head1 AUTHORS
+
+Program was written by <jari.aalto@cante.net>
+
+Released under license GNU GPL version 2 or (at your option) any
+later version. For more information about license, visit
+<http://www.gnu.org/copyleft/gpl.html>.
+
+=cut
