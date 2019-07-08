@@ -26,7 +26,7 @@
 #       See --help. Configuration files must exist before use.
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0708.1338"
+VERSION="2019.0708.1341"
 LICENSE="GPL-2+"
 
 # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -315,7 +315,7 @@ Main ()
         str=" Last-updated: $date"
 
         if [ ! "$date" ]; then
-            str=" Last-updated: UNKNOWN (timestamp not available until next update)"
+            str=" Last-updated: UNKNOWN (timestamp not available)"
         fi
 
         if [ "$ip_prev" = "$ip" ]; then
