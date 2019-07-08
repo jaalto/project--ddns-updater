@@ -7,17 +7,22 @@ Requires
 To install (as root)
 
    # Install without the *.sh extension.
-   # System wide programs dont use extensions.
+   # System wide programs do not have extensions.
 
-   install -m 755 ddns-updater.sh /usr/local/bin/ddns-updater
-   install -m 644 cron.d/ddns-updater /etc/cron.d/
+   install --mode=755 ddns-updater.sh /usr/local/bin/ddns-updater
+   install --mode=644 cron.d/ddns-updater /etc/cron.d/
 
-   mkdir -p ~/.ddns-updater
+   mkdir --parents ~/.config/ddns-updater
 
 Configure for ducdns.org
 
    # Copy TOKEN from your account page
    # SUBDOMAIN.ddns-updater.org
 
-   echo TOKEN > ~/.ddns-updater/duckdns.token
-   echo SUBDOMAIN,SUBDOMAIN... > ~/.ddns-updater/duckdns.domains
+   echo TOKEN > ~/.config/ddns-updater/duckdns.token
+   echo SUBDOMAIN,SUBDOMAIN... > ~/.config/ddns-updater/duckdns.domains
+
+Configure for dns.he.net
+
+   echo PASSWORD > ~/.config/ddns-updater/henet.pass
+   echo SUBDOMAIN,SUBDOMAIN... >  ~/.config/ddns-updater/henet.domains
