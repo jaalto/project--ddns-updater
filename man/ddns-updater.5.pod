@@ -66,6 +66,10 @@ Force update even if IP is same.
 
 Show status and exit.
 
+=item B<-S, --syslog>
+
+Send status to syslog. Can only be used by root.
+
 =item B<-t, --test, --dry-run>
 
 Run in test mode. No network update.
