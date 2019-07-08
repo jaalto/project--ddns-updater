@@ -26,7 +26,7 @@
 #       See --help. Configuration files must exist before use.
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0708.1536"
+VERSION="2019.0708.1553"
 LICENSE="GPL-2+"
 
 # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -75,27 +75,24 @@ DIRECTORIES
 FILES
   Configuration files:
 
-  # For duckdns.org
-  $CONF/duckdns.domains  Comma separated list of the subnames (not FQDN)
-  $CONF/duckdns.token    The token of account (see your profile)
+  $CONF/duckdns.conf
+  DUCKDNS_DOMAINS=host,host...
+  DUCKDNS_TOKEN=yourtoken
 
-  # For dns.he.org
-  $CONF/henet.user       The account username
-  $CONF/henet.pass       The account password
-  $CONF/henet.domain     A registered domain name
+  $CONF/henet.conf
+  HENET_DOMAIN=host.exmaple.com
+  HENET_PASS=password
 
   Internal house keeping files:
 
   $CONF/00.ip            Current ip
   $CONF/00.updated       contains YYYY-MM-DD HH:MM of last update"
 
-DUCKDNS_FILE_DOMAINS=$CONF/duckdns.domains
-DUCKDNS_FILE_TOKEN=$CONF/duckdns.token
+DUCKDNS_FILE_CONF=$CONF/duckdns.conf
 DUCKDNS_FILE_LOG=$CONF/duckdns.log
 DUCKDNS_URI_VERBOSE="&verbose=true"
 
-HENET_FILE_PASS=$CONF/henet.pass
-HENET_FILE_DOMAIN=$CONF/henet.domain
+HENET_FILE_CONF=$CONF/henet.conf
 HENET_FILE_LOG=$CONF/henet.log
 
 # Use prefix 00.* to make data files to appear first in ls(1)
@@ -209,7 +206,8 @@ IpCurrent ()
 
 IsHenet ()
 {
-    [ -f "$HENET_FILE_PASS" ]
+    [ -f "$HENET_FILE_CONF" ] || return 1
+    . $HENET_FILE_CONF
 }
 
 HenetStatus ()
@@ -262,7 +260,7 @@ Henet ()
     #
     # https://dyn.dns.he.net/nic/update?hostname=$HOST&password=$PASS&myip=$IP"
 
-    url="https://$domain:$pass@dyn.dns.he.net/nic/update?hostname=$domain"
+    url="https://$domain:$pass@dyn.dns.he.net/nic/update?hostname=$domain&myip=$ip"
 
     Verbose "Info: Updating Henet..."
     CURL_OPTS="--max-time=10 --ipv4" Webcall "$HENET_FILE_LOG" "$url"
@@ -271,7 +269,8 @@ Henet ()
 
 IsDuckdns ()
 {
-    [ -f "$DUCKDNS_FILE_TOKEN" ]
+    [ -f "$DUCKDNS_FILE_CONF" ] || return 1
+    . $DUCKDNS_FILE_CONF
 }
 
 DuckdnsStatus ()
@@ -300,20 +299,15 @@ DuckdnsStatus ()
 Duckdns ()
 {
     ip=$1
-    domains=$(sed -e 's/[ \t]*//' $DUCKDNS_FILE_DOMAINS)
-    token=$(cat $DUCKDNS_FILE_TOKEN)
+    domains=$DUCKDNS_DOMAINS
+    token=$DUCKDNS_TOKEN
 
     if [ ! "$token" ] ; then
-        Die "ERROR: No token id in: $DUCKDNS_FILE_TOKEN"
+        Die "ERROR: No DUCKDNS_TOKEN in $DUCKDNS_FILE_CONF"
     fi
 
     if [ ! "$domains" ]; then
-        Die "ERROR: No subdomains in: $DUCKDNS_FILE_DOMAINS"
-    fi
-
-    if grep "\." $DUCKDNS_FILE_DOMAINS ; then
-        Die "ERROR: FQDN names not allowed, only subdomains" \
-            "names in: $DUCKDNS_FILE_DOMAINS"
+        Die "ERROR: No DUCKDNS_DOMAINS in $DUCKDNS_FILE_CONF"
     fi
 
     url="https://www.duckdns.org/update?domains=$domains&token=$token&ip=$ip$DUCKDNS_URI_VERBOSE"
@@ -449,8 +443,6 @@ Main ()
     fi
 }
 
-#Main "$@"
-SYSLOG=1
-DuckdnsStatus 91.157.45.105
+Main "$@"
 
 # End of file
