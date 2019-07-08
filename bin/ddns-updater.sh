@@ -1,4 +1,4 @@
-# /bin/sh
+#! /bin/sh
 #
 #   Copyright
 #
@@ -26,7 +26,7 @@
 #       See --help. Configuration files must exist before use.
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0708.1218"
+VERSION="2019.0708.1306"
 LICENSE="GPL-2+"
 
 # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -131,14 +131,46 @@ OldIP ()
     cat $FILE_IP 2> /dev/null
 }
 
-CurrentIP ()
-{
-    curl --silent ifconfig.co
-}
-
 Help ()
 {
     echo "$HELP" | sed "s,$HOME,~,g"
+}
+
+Webcall ()
+{
+    # ARGUMENTS: URL [LOGFILE]
+    logfile=$2
+
+    if which curl > /dev/null 2>&1 ; then
+        if [ "$logfile" ]; then
+            ${TEST:+echo} curl --silent --insecure --output "$logfile" "$1"
+        else
+            ${TEST:+echo} curl --silent --insecure "$1"
+        fi
+    elif which wget > /dev/null 2>&1 ; then
+        if [ "$logfile" ]; then
+            ${TEST:+echo} wget --quiet --output-document="$logfile" "$1"
+        else
+            ${TEST:+echo} wget --quiet "$1"
+        fi
+    elif which lynx > /dev/null 2>&1 ; then
+        if [ "$logfile" ]; then
+            lynx --dump "$2" > "$logfile"
+        else
+            lynx --dump "$2"
+        fi
+    else
+        Die "ERROR: No programs to access web: curl, wget or lynx"
+    fi
+}
+
+CurrentIP ()
+{
+    if [ "$TEST" ]; then
+        echo "0.0.0.0"
+    else
+        Webcall ifconfig.co
+    fi
 }
 
 IsHenet ()
@@ -195,7 +227,7 @@ Duckdns ()
     url="https://www.duckdns.org/update?domains=$domains&token=$token&ip=$ip$DUCKDNS_URI_VERBOSE"
 
     Echo "Info: Updating Duckdns..."
-    ${TEST:+echo} curl --silent --insecure --output $DUCKDNS_LOG "$url"
+    Webcall "$DUCKDNS_LOG" "$url"
 
     # Add missing last NEWLINE
     [ "$TEST" ] || echo >> $DUCKDNS_LOG
