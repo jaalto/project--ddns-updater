@@ -117,7 +117,7 @@ Main ()
     fi
     
     if [ ! "$DOMAINS" ]; then
-	Die "ERROR: No domains in: $DOMFILE"
+	Die "ERROR: No subdomains in: $DOMFILE"
     fi
 
     if grep "\." $DOMFILE ; then
