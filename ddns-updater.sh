@@ -1,20 +1,33 @@
 # /bin/sh
 #
-# crontab -e
-# */30 * * * * ~/.duckdns/duckdns.sh >/dev/null 2>&1
+#   Copyright
+#
+#       Copyright (C) 2019 Jari Aalto <jari.aalto@cante.net>
+#
+#   License
+#
+#       This program is free software; you can redistribute it and/or modify
+#       it under the terms of the GNU General Public License as published by
+#       the Free Software Foundation; either version 2 of the License, or
+#       (at your option) any later version.
+#
+#       This program is distributed in the hope that it will be useful,
+#       but WITHOUT ANY WARRANTY; without even the implied warranty of
+#       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#       GNU General Public License for more details.
+#
+#       You should have received a copy of the GNU General Public License
+#       along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+#   Description
+#
+#       Dynamic DNS (DDNS) update client implemented in POSIX shell script.
+#
+#       See --help. Configuration files must exist before use.
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0708.0909"
+VERSION="2019.0708.1118"
 LICENSE="GPL-2+"
-
-CONF=$HOME/.duckdns
-DOMFILE=$CONF/domains
-DOMAINS=$(sed -e 's/[ \t]*//' $DOMFILE)
-TOKEN=$(cat $CONF/token)
-LOG=$CONF/log
-FILE_IP=$CONF/ip
-FILE_TIMESTAMP=$CONF/last-update
-VERBOSE_URI="&verbose=true"
 
 HELP="\
 Synopsis: $0 [option]
@@ -25,15 +38,58 @@ DESCRIPTION
 OPTIONS
   -f, --force    Force update even if IP is same.
   -s, --status   Show status and exit.
+  -t, --test     Run in test mode. No real update.
   -v, --verbose  Display verbose output.
   -V, --version  Display version information and exit.
   -h, --help     Display short help.
 
-FILES
-  These files must exist:
+  Please note that stacking of short options is not supported. E.g.
+  -v -f cannot be combined into -vf.
 
-  $CONF/domains  Comma separated list of the subnames
-  $CONF/token    The token of account (see your profile)"
+FILES
+  User configuration files:
+
+  # For duckdns.org
+  $CONF/duckdns.domains  Comma separated list of the subnames (not FQDN)
+  $CONF/duckdns.token    The token of account (see your profile)
+
+  # For dns.he.org
+  $CONF/henet.domains    Comma separated list of the subnames
+  $CONF/henet.pass       The account password
+
+  Internal house keeping files:
+
+  00.ip                  Current ip
+  00.updated             contains YYYY-MM-DD HH:MM of last update"
+
+# See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+if [ "$XDG_CONFIG_HOME" ]; then
+    CONFHOME=$XDG_CONFIG_HOME/ddns-updater
+else
+    CONFHOME=$HOME/.config/ddns-updater
+fi
+
+CONF=
+
+for dir in $CONFHOME /etc/ddns-updater
+do
+    if [ -d "$dir" ]; then
+        CONF=$dir
+    fi
+done
+
+DUCKDNS_FILE_DOMAINS=$CONF/duckdns.domains
+DUCKDNS_FILE_TOKEN=$CONF/duckdns.token
+DUCKDNS_FILE_LOG=$CONF/duckdns.log
+DUCKDNS_URI_VERBOSE="&verbose=true"
+
+HENET_FILE_DOMAINS=$CONF/henet.domains
+HENET_FILE_PASS=$CONF/henet.pass
+HENET_FILE_LOG=$CONF/henet.log
+
+# Use prefix 00.* to make data files to appear first in ls(1)
+FILE_IP=$CONF/00.ip
+FILE_TIMESTAMP=$CONF/00.updated
 
 Version ()
 {
@@ -71,32 +127,93 @@ CurrentIP ()
     curl --silent ifconfig.co
 }
 
-Status ()
+IsHenet ()
 {
-    # Linus commands do not display anything by default but
-    # return status code, like:
-    #
-    # <command> ; echo $?
+    [ -f "$HENET_FILE_PASS" ]
+}
+
+HenetStatus ()
+{
+    [ -f "$HENET_FILE_LOG" ] || return 2
 
     if [ "$VERBOSE" ]; then
-        cat $LOG
+        cat $HENET_FILE_LOG
     fi
 
-    grep "^OK" $LOG > /dev/null 2>&1
+    grep "^OK" $HENET_FILE_LOG > /dev/null 2>&1
+}
+
+Henet ()
+{
+    :
+}
+
+IsDuckdns ()
+{
+    [ -f "$DUCKDNS_FILE_TOKEN" ]
+}
+
+DuckdnsStatus ()
+{
+    [ -f "$DUCKDNS_FILE_LOG" ] || return 2
+
+    grep "^OK" $DUCKDNS_FILE_LOG > /dev/null 2>&1
+}
+
+Duckdns ()
+{
+    domains=$(sed -e 's/[ \t]*//' $DUCKDNS_FILE_DOMAINS)
+    token=$(cat $DUCKDNS_FILE_TOKEN)
+
+    if [ ! "$token" ] ; then
+        Die "ERROR: No token id in: $DUCKDNS_FILE_TOKEN"
+    fi
+
+    if [ ! "$domains" ]; then
+        Die "ERROR: No subdomains in: $DUCKDNS_FILE_DOMAINS"
+    fi
+
+    if grep "\." $DUCKDNS_FILE_DOMAINS ; then
+        Die "ERROR: FQDN names not allowed, only subdomains" \
+            "names in: $DUCKDNS_FILE_DOMAINS"
+    fi
+
+    url="https://www.duckdns.org/update?domains=$domains&token=$token&ip=$ip$DUCKDNS_URI_VERBOSE"
+
+    Echo "Info: Updating Duckdns..."
+    ${TEST:+echo} curl --silent --insecure --output $DUCKDNS_LOG "$url"
+
+    # Add missing last NEWLINE
+    [ "$TEST" ] || echo >> $DUCKDNS_LOG
+
+    if [ "$VERBOSE" ]; then
+        # Delete empty lines
+        sed '/^[ \t]*$/d' $DUCKDNS_FILE_LOG
+    fi
+
+    Echo "Info: Updating Duckdns...done"
 }
 
 Main ()
 {
+    unset TEST
+
     while :
     do
         case "$1" in
             -f | --force)
                 shift
-                force=force
+                FORCE=force
                 ;;
             -s | --status)
                 shift
                 status=status
+                ;;
+            -t | --test | --dry-run)
+                shift
+                echo "** Running in test mode, no network calls"
+                VERBOSE=verbose
+                TEST=test
                 ;;
             -v | --verbose)
                 shift
@@ -123,26 +240,16 @@ Main ()
         esac
     done
 
+    if [ ! "$CONF" ] ; then
+        Die "ERROR: No configuration directory: $CONFHOME"
+    fi
+
     if [ ! -d "$CONF" ]; then
         Die "ERROR: No configuration directory: $CONF"
     fi
 
-    if [ ! "$DOMAINS" ]; then
-        Die "ERROR: No subdomains in: $DOMFILE"
-    fi
-
-    if grep "\." $DOMFILE ; then
-        Die "ERROR: FQDN names not allowed, only subdomains names in: $DOMFILE"
-    fi
-
-    if [ ! "$TOKEN" ] ; then
-        Die "ERROR: No token id in: $CONF/token"
-
-    fi
-
     ip_old=$(OldIP)
     ip=$(CurrentIP)
-    url="https://www.duckdns.org/update?domains=$DOMAINS&token=$TOKEN&ip=$ip$VERBOSE_URI"
 
     Echo "IP old: $ip_old"
     Echo "IP now: $ip"
@@ -170,16 +277,24 @@ Main ()
         return 0
     fi
 
-    if [ ! "$force" ] && [ "$ip_old" = "$ip" ]; then
+    if [ ! "$FORCE" ] && [ "$ip_old" = "$ip" ]; then
         Echo "Info: Nothing to update"
         return 0
     else
         echo $ip > $FILE_IP
         Date > $FILE_TIMESTAMP
-        Echo "Info: Updating..."
-        curl --silent --insecure --output $LOG "$url"
-        Echo "Info: Updating...done"
-        Status
+
+        done=
+        status=0
+
+        IsDuckdns && { Duckdns $ip ; DuckdnsStatus; status=$? ; done=done ;}
+        IsHenet   && { Henet $ip ; HenetStatus; status=$? ; done=done ; }
+
+        if [ ! "$done" ]; then
+            Die "WARN: No DDNS configuration files. See --help."
+        fi
+
+        return $status
     fi
 }
 
