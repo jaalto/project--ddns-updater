@@ -21,12 +21,12 @@
 #
 #   Description
 #
-#       Dynamic DNS (DDNS) update client implemented in POSIX shell script.
+#       Dynamic DNS (DDNS) update client.
 #
 #       See --help. Configuration files must exist before use.
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0708.1154"
+VERSION="2019.0708.1218"
 LICENSE="GPL-2+"
 
 # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -56,8 +56,8 @@ DESCRIPTION
 OPTIONS
   -f, --force    Force update even if IP is same.
   -s, --status   Show status and exit.
-  -t, --test     Run in test mode. No real update.
-  -v, --verbose  Display verbose output.
+  -t, --test     Run in test mode. No network update.
+  -v, --verbose  Display verbose messages.
   -V, --version  Display version information and exit.
   -h, --help     Display short help.
 
@@ -68,8 +68,8 @@ DIRECTORIES
 
   CONFDIR Configuration directories searched in order:
 
-  \$HOME/.config/ddns-updater/
-  /etc/ddns-updater/
+  \$HOME/.config/ddns-updater
+  /etc/ddns-updater
 
 FILES
   Configuration files:
@@ -84,8 +84,8 @@ FILES
 
   Internal house keeping files:
 
-  00.ip                  Current ip
-  00.updated             contains YYYY-MM-DD HH:MM of last update"
+  $CONF/00.ip             Current ip
+  $CONF/00.updated        contains YYYY-MM-DD HH:MM of last update"
 
 DUCKDNS_FILE_DOMAINS=$CONF/duckdns.domains
 DUCKDNS_FILE_TOKEN=$CONF/duckdns.token
