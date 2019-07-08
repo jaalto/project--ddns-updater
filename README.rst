@@ -5,7 +5,7 @@
 DESCRIPTION
 ===========
 
-A shell program to update IP address to services:
+A shell program to update IP address to Dynamic DNS (DDNS) services:
 
 - http://duckdns.org [1]
 - http://dns.he.net  [2]
