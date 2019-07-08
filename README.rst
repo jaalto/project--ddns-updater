@@ -7,8 +7,8 @@ DESCRIPTION
 
 A shell program to update IP address to services:
 
-    http://duckdns.org [1]
-    http://dns.he.net  [2]
+- http://duckdns.org [1]
+- http://dns.he.net  [2]
 
 You need account and domains from one of the services services.
 
@@ -46,8 +46,8 @@ See details in separate INSTALL file.
 REFERENCES
 ==========
 
-[1] Free DDNS hosting at https://www.duckdns.org/spec.jsp
-[2] Hurricane Electric Free DDNS hosting in Europe. https://dns.he.net
+- [1] Free DDNS hosting at https://www.duckdns.org/spec.jsp
+- [2] Hurricane Electric Free DDNS hosting in Europe. https://dns.he.net
 
 COPYRIGHT AND LICENSE
 =====================
