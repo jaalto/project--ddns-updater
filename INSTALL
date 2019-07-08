@@ -17,7 +17,7 @@ To install (as root)
 Configure for ducdns.org
 
    # Copy TOKEN from your account page
-   # SUBDOMAIN.ddns-updater.org
+   # SUBDOMAIN.duckdns.org
 
    echo TOKEN > ~/.config/ddns-updater/duckdns.token
    echo SUBDOMAIN,SUBDOMAIN... > ~/.config/ddns-updater/duckdns.domains
