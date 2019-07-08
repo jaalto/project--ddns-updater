@@ -179,7 +179,7 @@ doc: man
 # Rule: test-shell - Check SH file syntax
 test-shell:
 	# test-shell - Check SH file syntaxes
-	# checkbashisms is from Debian package devscripts
+	# Use checkbashisms if available (Debian package devscripts)
 	@for file in $$(find . -name "*.sh"); \
 	do \
 	    sh -nx "$$file"; \
