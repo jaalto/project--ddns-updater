@@ -116,13 +116,13 @@ The C<$CONF> refers to configuration directory. Search order:
   $HOME/.config/ddns-updater
   /etc/ddns-updater
 
-Configuration files for duckdns.org
+Configuration file for duckdns.org
 
   $CONF/duckdns.conf
   DUCKDNS_DOMAINS=host,host...
   DUCKDNS_TOKEN=yourtoken
 
-Configuration files for dns.he.net
+Configuration file for dns.he.net
 
   $CONF/henet.conf
   HENET_DOMAIN=host.exmaple.com
