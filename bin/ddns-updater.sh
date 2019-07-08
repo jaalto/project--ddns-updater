@@ -26,7 +26,7 @@
 #       See --help. Configuration files must exist before use.
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0708.1341"
+VERSION="2019.0708.1357"
 LICENSE="GPL-2+"
 
 # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -79,8 +79,9 @@ FILES
   $CONF/duckdns.token    The token of account (see your profile)
 
   # For dns.he.org
-  $CONF/henet.domains    Comma separated list of the subnames
+  $CONF/henet.user       The account username
   $CONF/henet.pass       The account password
+  $CONF/henet.domains    Comma separated list of the subnames
 
   Internal house keeping files:
 
@@ -92,8 +93,9 @@ DUCKDNS_FILE_TOKEN=$CONF/duckdns.token
 DUCKDNS_FILE_LOG=$CONF/duckdns.log
 DUCKDNS_URI_VERBOSE="&verbose=true"
 
-HENET_FILE_DOMAINS=$CONF/henet.domains
+HENET_FILE_PASS=$CONF/henet.user
 HENET_FILE_PASS=$CONF/henet.pass
+HENET_FILE_DOMAINS=$CONF/henet.domains
 HENET_FILE_LOG=$CONF/henet.log
 
 # Use prefix 00.* to make data files to appear first in ls(1)
