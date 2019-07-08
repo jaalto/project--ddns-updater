@@ -91,7 +91,7 @@ INSTALL_OBJS_BIN = bin/$(BIN)
 INSTALL_OBJS_DOC = AUTHORS INSTALL README.rst
 INSTALL_OBJS_MAN = man/*.$(MANSECT)
 INSTALL_OBJS_CRON = cron.d/$(NAME)
-INSTALL_OBJS_CONF = duckdns.token duckdns.domains henet.pass henet.domain
+INSTALL_OBJS_CONF = conf/duckdns.conf conf/henet.conf
 
 all:
 	@echo "Nothing to compile."
@@ -215,7 +215,7 @@ install-conf:
 
 	for f in $(INSTALL_OBJS_CONF); \
 	do \
-		[ -f "$(CONFDIR)/$$f" ] || touch "$(CONFDIR)/$$f" ; \
+		[ -f "$(CONFDIR)/$$f" ] || install --mode=644 $$f $(CONFDIR) ; \
 	done
 
 install-doc:
