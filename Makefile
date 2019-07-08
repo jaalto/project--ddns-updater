@@ -38,10 +38,12 @@ mandir		= $(man_prefix)/man
 bindir		= $(exec_prefix)/bin
 sbindir		= $(exec_prefix)/sbin
 sharedir	= $(prefix)/share
-confdir		= /etc/$(NAME)
+confdir		= /etc
+crondir		= $(confdir)/cron.d
 
 BINDIR		= $(DESTDIR)$(bindir)
-CONFDIR		= $(DESTDIR)$(confdir)
+CONFDIR		= $(DESTDIR)$(confdir)/$(NAME)
+CRONDIR		= $(DESTDIR)$(crondir)
 DOCDIR		= $(DESTDIR)$(sharedir)/doc/$(PACKAGE_DOC)
 EXAMPLESDIR	= $(DOCDIR)/examples
 LOCALEDIR	= $(DESTDIR)$(sharedir)/locale
@@ -88,6 +90,7 @@ INSTALL_OBJS_LIB = README.rst makefile.sh .bash* .ssh/*
 INSTALL_OBJS_BIN = bin/$(BIN)
 INSTALL_OBJS_DOC = AUTHORS INSTALL README.rst
 INSTALL_OBJS_MAN = man/*.$(MANSECT)
+INSTALL_OBJS_CRON = cron.d/$(NAME)
 INSTALL_OBJS_CONF = duckdns.token duckdns.domains henet.pass henet.domains
 
 all:
@@ -197,6 +200,15 @@ test-pod:
 # Rule: test - Run tests
 test: test-pod test-shell
 
+install-cron:
+	# install-cron - Install cron job
+	$(INSTALL_BIN) -d $(CRONDIR)
+
+	for f in $(INSTALL_OBJS_CRON); \
+	do \
+		[ -f "$(CRONDIR)/$$f" ] || $(INSTALL_DATA) "$$f" "$(CRONDIR)" ; \
+	done
+
 install-conf:
 	# install-doc - Install configuration file templates (empty)
 	$(INSTALL_BIN) -d $(CONFDIR)
@@ -241,7 +253,7 @@ install-bin:
 	done
 
 # Rule: install - Standard install
-install: install-bin install-conf install-man install-doc
+install: install-bin install-conf install-cron install-man install-doc
 
 # Rule: install-test - [maintainer] run test installation to tmp/
 install-test:
