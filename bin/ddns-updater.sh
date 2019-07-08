@@ -26,7 +26,7 @@
 #       See --help. Configuration files must exist before use.
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0708.1357"
+VERSION="2019.0708.1428"
 LICENSE="GPL-2+"
 
 # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -81,21 +81,20 @@ FILES
   # For dns.he.org
   $CONF/henet.user       The account username
   $CONF/henet.pass       The account password
-  $CONF/henet.domains    Comma separated list of the subnames
+  $CONF/henet.domain     A registered domain name
 
   Internal house keeping files:
 
-  $CONF/00.ip             Current ip
-  $CONF/00.updated        contains YYYY-MM-DD HH:MM of last update"
+  $CONF/00.ip            Current ip
+  $CONF/00.updated       contains YYYY-MM-DD HH:MM of last update"
 
 DUCKDNS_FILE_DOMAINS=$CONF/duckdns.domains
 DUCKDNS_FILE_TOKEN=$CONF/duckdns.token
 DUCKDNS_FILE_LOG=$CONF/duckdns.log
 DUCKDNS_URI_VERBOSE="&verbose=true"
 
-HENET_FILE_PASS=$CONF/henet.user
 HENET_FILE_PASS=$CONF/henet.pass
-HENET_FILE_DOMAINS=$CONF/henet.domains
+HENET_FILE_DOMAIN=$CONF/henet.domain
 HENET_FILE_LOG=$CONF/henet.log
 
 # Use prefix 00.* to make data files to appear first in ls(1)
@@ -199,7 +198,28 @@ HenetStatus ()
 
 Henet ()
 {
-    :
+    ip=$1
+
+    domain=$(sed -e 's/[ \t]*//' $HENET_FILE_DOMAIN)
+    pass=$(cat $HENET_FILE_PASS)
+
+    if [ ! "$pass" ] ; then
+        Die "ERROR: no password in: $HENET_FILE_PASS"
+    fi
+
+    if [ ! "$domain" ]; then
+        Die "ERROR: No FQDN in: $HENET_FILE_DOMAIN"
+    fi
+
+    # https://dns.he.net/docs.html
+    # http://[your domain name]:[your password]@dyn.dns.he.net/nic/update?hostname=[your domain name]
+    # username is also the hostname
+
+    url="https://$domain:$pass@dyn.dns.he.net/nic/update?hostname=$domain"
+
+    Verbose "Info: Updating Henet..."
+    Webcall "$HENET_FILE_LOG" "$url"
+    Verbose "Info: Updating Henet...done"
 }
 
 IsDuckdns ()
@@ -216,6 +236,7 @@ DuckdnsStatus ()
 
 Duckdns ()
 {
+    ip=$1
     domains=$(sed -e 's/[ \t]*//' $DUCKDNS_FILE_DOMAINS)
     token=$(cat $DUCKDNS_FILE_TOKEN)
 
@@ -235,10 +256,10 @@ Duckdns ()
     url="https://www.duckdns.org/update?domains=$domains&token=$token&ip=$ip$DUCKDNS_URI_VERBOSE"
 
     Verbose "Info: Updating Duckdns..."
-    Webcall "$DUCKDNS_LOG" "$url"
+    Webcall "$DUCKDNS_FILE_LOG" "$url"
 
     # Add missing last NEWLINE
-    [ "$TEST" ] || echo >> $DUCKDNS_LOG
+    [ "$TEST" ] || echo >> $DUCKDNS_FILE_LOG
 
     if [ "$VERBOSE" ]; then
         # Delete empty lines

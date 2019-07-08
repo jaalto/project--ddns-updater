@@ -91,7 +91,7 @@ INSTALL_OBJS_BIN = bin/$(BIN)
 INSTALL_OBJS_DOC = AUTHORS INSTALL README.rst
 INSTALL_OBJS_MAN = man/*.$(MANSECT)
 INSTALL_OBJS_CRON = cron.d/$(NAME)
-INSTALL_OBJS_CONF = duckdns.token duckdns.domains henet.user henet.pass henet.domains
+INSTALL_OBJS_CONF = duckdns.token duckdns.domains henet.pass henet.domain
 
 all:
 	@echo "Nothing to compile."

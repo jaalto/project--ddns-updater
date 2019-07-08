@@ -118,9 +118,8 @@ Configuration files for duckdns.org
 
 Configuration files for dns.he.net
 
-  $CONF/henet.user       The account username
   $CONF/henet.pass       The account password
-  $CONF/henet.domains    Comma separated list of the subnames
+  $CONF/henet.domain     A registered domain name
 
 Internal house keeping files:
 

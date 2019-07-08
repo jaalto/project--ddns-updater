@@ -40,4 +40,4 @@ Configure for ducdns.org
 Configure for dns.he.net
 
    echo PASSWORD > $HOME/.config/ddns-updater/henet.pass
-   echo SUBDOMAIN,SUBDOMAIN... >  $HOME/.config/ddns-updater/henet.domains
+   echo FDQN >  $HOME/.config/ddns-updater/henet.domain
