@@ -86,7 +86,7 @@ RELEASE		= $(PACKAGE)-$(VERSION)
 
 INSTALL_OBJS_LIB = README.rst makefile.sh .bash* .ssh/*
 INSTALL_OBJS_BIN = bin/$(BIN)
-INSTALL_OBJS_DOC = README.rst INSTALL
+INSTALL_OBJS_DOC = AUTHORS INSTALL README.rst
 INSTALL_OBJS_MAN = man/*.$(MANSECT)
 INSTALL_OBJS_CONF = duckdns.token duckdns.domains henet.pass henet.domains
 
