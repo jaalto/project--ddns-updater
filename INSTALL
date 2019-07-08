@@ -7,13 +7,11 @@ Requires
 To install (as root)
 
    install -m 755 ddns-duckdns.sh /usr/local/bin/ddns-duckdns
+   install -m 644 cron.d/ddns-duckdns /etc/cron.d/
+
    mkdir -p ~/.duckdns
 
    # Copy TOKEN from your account page
    # SUBDOMAIN.duckdns.org
-
    echo TOKEN > ~/.duckdns/token
    echo SUBDOMAIN,SUBDOMAIN... > ~/.duckdns/domains
-
-   crontab -e
-   */30 * * * * ddns-duckdns.sh
