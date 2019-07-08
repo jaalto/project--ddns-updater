@@ -26,7 +26,7 @@
 #       See --help. Configuration files must exist before use.
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0708.1428"
+VERSION="2019.0708.1536"
 LICENSE="GPL-2+"
 
 # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -56,6 +56,7 @@ DESCRIPTION
 OPTIONS
   -f, --force    Force update even if IP is same.
   -s, --status   Show status and exit.
+  -S, --syslog   Send status to syslog.
   -t, --test     Run in test mode. No network update.
   -v, --verbose  Display verbose messages.
   -V, --version  Display version information and exit.
@@ -101,6 +102,8 @@ HENET_FILE_LOG=$CONF/henet.log
 FILE_IP=$CONF/00.ip
 FILE_TIMESTAMP=$CONF/00.updated
 MSG_PREFIX="[DDNS-UPDATER] "
+CURL_OPTS="--max-time=10"
+WGET_OPTS=
 
 Version ()
 {
@@ -133,6 +136,30 @@ Date ()
     date "+%Y-%m-%d %H:%M"
 }
 
+SyslogWrite ()
+{
+   status=$1
+   id=$2
+   ip=$3
+   msg=$4
+
+    case "$status" in
+      *good*)
+        logger -p local0.info   -t $id "OK: $ip address updated$msg" ;;
+      *nochange*)
+        logger -p local0.notice -t $id "OK: $ip address no change$msg" ;;
+      *)
+        logger -p local0.err    -t $id "ERROR: $ip address not updated$msg" ;;
+    esac
+}
+
+Syslog ()
+{
+    if [ "$SYSLOG" ]; then
+        SyslogWrite "$@"
+    fi
+}
+
 IpPrevious ()
 {
     cat $FILE_IP 2> /dev/null
@@ -150,15 +177,15 @@ Webcall ()
 
     if which curl > /dev/null 2>&1 ; then
         if [ "$logfile" ]; then
-            ${TEST:+echo} curl --silent --insecure --output "$logfile" "$1"
+            ${TEST:+echo} curl --silent --insecure --output "$logfile" $CURL_OPTS "$1"
         else
-            ${TEST:+echo} curl --silent --insecure "$1"
+            ${TEST:+echo} curl --silent --insecure $CURL_OPTS "$1"
         fi
     elif which wget > /dev/null 2>&1 ; then
         if [ "$logfile" ]; then
-            ${TEST:+echo} wget --quiet --output-document="$logfile" "$1"
+            ${TEST:+echo} wget --quiet --output-document="$logfile" $WGET_OPTS "$1"
         else
-            ${TEST:+echo} wget --quiet "$1"
+            ${TEST:+echo} wget --quiet $WGET_OPTS "$1"
         fi
     elif which lynx > /dev/null 2>&1 ; then
         if [ "$logfile" ]; then
@@ -193,7 +220,25 @@ HenetStatus ()
         cat $HENET_FILE_LOG
     fi
 
-    grep "^OK" $HENET_FILE_LOG > /dev/null 2>&1
+    # on success, either:
+    #   good 192.168.0.1
+    #   nochg 192.168.0.1
+
+    [ "$VERBOSE" ] && cat $HENET_FILE_LOG
+
+    str=$(cat $HENET_FILE_LOG | tr '\n' ' ' | sed 's,[ \ŧ]*$,,')
+
+    case "$str" in
+        *good*)
+            Syslog nochange DNS-HENET $ip
+            return 0
+            ;;
+        *nochg*) Syslog good DNS-HENET $ip
+             return 0
+             ;;
+        *)  Syslog error DNS-HENET $ip "$str"
+            return 1
+    esac
 }
 
 Henet ()
@@ -214,11 +259,13 @@ Henet ()
     # https://dns.he.net/docs.html
     # http://[your domain name]:[your password]@dyn.dns.he.net/nic/update?hostname=[your domain name]
     # username is also the hostname
+    #
+    # https://dyn.dns.he.net/nic/update?hostname=$HOST&password=$PASS&myip=$IP"
 
     url="https://$domain:$pass@dyn.dns.he.net/nic/update?hostname=$domain"
 
     Verbose "Info: Updating Henet..."
-    Webcall "$HENET_FILE_LOG" "$url"
+    CURL_OPTS="--max-time=10 --ipv4" Webcall "$HENET_FILE_LOG" "$url"
     Verbose "Info: Updating Henet...done"
 }
 
@@ -229,9 +276,25 @@ IsDuckdns ()
 
 DuckdnsStatus ()
 {
+    ip=$1
+
     [ -f "$DUCKDNS_FILE_LOG" ] || return 2
 
-    grep "^OK" $DUCKDNS_FILE_LOG > /dev/null 2>&1
+    [ "$VERBOSE" ] && cat $DUCKDNS_FILE_LOG
+
+    str=$(cat $DUCKDNS_FILE_LOG | tr '\n' ' ' | sed 's,[ \ŧ]*$,,')
+
+    case "$str" in
+        *NOCHANGE*)
+            Syslog nochange DNS-DUCK $ip
+            return 0
+            ;;
+        OK*) Syslog good DNS-DUCK $ip
+             return 0
+             ;;
+        *)  Syslog error DNS-DUCK $ip "$str"
+            return 1
+    esac
 }
 
 Duckdns ()
@@ -283,6 +346,10 @@ Main ()
             -s | --status)
                 shift
                 status=status
+                ;;
+            -S | --syslog)
+                shift
+                SYSLOG=syslog
                 ;;
             -t | --test | --dry-run)
                 shift
@@ -371,8 +438,8 @@ Main ()
         done=
         status=0
 
-        IsDuckdns && { Duckdns $ip ; DuckdnsStatus; status=$? ; done=done ;}
-        IsHenet   && { Henet $ip ; HenetStatus; status=$? ; done=done ; }
+        IsDuckdns && { Duckdns $ip ; DuckdnsStatus $ip; status=$? ; done=done ;}
+        IsHenet   && { Henet $ip ; HenetStatus $ip; status=$? ; done=done ; }
 
         if [ ! "$done" ]; then
             Die "WARN: No DDNS configuration files. See --help."
@@ -382,6 +449,8 @@ Main ()
     fi
 }
 
-Main "$@"
+#Main "$@"
+SYSLOG=1
+DuckdnsStatus 91.157.45.105
 
 # End of file
