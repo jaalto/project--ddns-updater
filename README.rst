@@ -36,7 +36,7 @@ REQUIREMENTS
 
 1. POSIX environment and standard utilities (grep, awk...)
 
-2. POSIX ``/bin/sh`` and ``curl(1)`` client.
+2. POSIX ``/bin/sh`` and some web client like ``curl(1)``, ``wget(1)`` etc.
 
 INSTALL
 =======
