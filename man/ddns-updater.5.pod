@@ -111,6 +111,11 @@ POSIX
 
 =head1 FILES
 
+Program initialization files (read in this order)
+
+  /etc/defaults/ddns-updater
+  $HOME/.ddns-updater
+
 The C<$CONF> refers to configuration directory. Search order:
 
   $HOME/.config/ddns-updater

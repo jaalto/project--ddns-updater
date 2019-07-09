@@ -43,6 +43,7 @@ crondir		= $(confdir)/cron.d
 
 BINDIR		= $(DESTDIR)$(bindir)
 CONFDIR		= $(DESTDIR)$(confdir)/$(NAME)
+DEFAULTSDIR	= $(DESTDIR)$(confdir)/defaults
 CRONDIR		= $(DESTDIR)$(crondir)
 DOCDIR		= $(DESTDIR)$(sharedir)/doc/$(PACKAGE_DOC)
 EXAMPLESDIR	= $(DOCDIR)/examples
@@ -92,6 +93,7 @@ INSTALL_OBJS_DOC = AUTHORS INSTALL README.rst
 INSTALL_OBJS_MAN = man/*.$(MANSECT)
 INSTALL_OBJS_CRON = cron.d/$(NAME)
 INSTALL_OBJS_CONF = conf/duckdns.conf conf/henet.conf
+INSTALL_OBJS_DEFAULTS = conf/$(NAME).conf
 
 all:
 	@echo "Nothing to compile."
@@ -209,6 +211,13 @@ install-cron:
 		[ -f "$(CRONDIR)/$$f" ] || $(INSTALL_DATA) "$$f" "$(CRONDIR)" ; \
 	done
 
+install-defaults:
+	# install-defaults - Install configuration file
+	$(INSTALL_BIN) -d $(DEFAULTSDIR)
+
+	[ ! "$(INSTALL_OBJS_DOC)" ] || \
+		$(INSTALL_DATA) $(INSTALL_OBJS_DEFAULTS) $(DEFAULTSDIR)
+
 install-conf:
 	# install-doc - Install configuration file templates (empty)
 	$(INSTALL_BIN) -d $(CONFDIR)
@@ -253,7 +262,7 @@ install-bin:
 	done
 
 # Rule: install - Standard install
-install: install-bin install-conf install-cron install-man install-doc
+install: install-bin install-conf install-defaults install-cron install-man install-doc
 
 # Rule: install-test - [maintainer] run test installation to tmp/
 install-test:

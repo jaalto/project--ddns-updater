@@ -26,7 +26,7 @@
 #       See --help. Configuration files must exist before use.
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0708.1609"
+VERSION="2019.0709.0430"
 LICENSE="GPL-2+"
 
 # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -83,7 +83,12 @@ FILES
   HENET_DOMAIN=host.exmaple.com
   HENET_PASS=password
 
-  Internal house keeping files:
+  Program configuration file (read in this order):
+
+  /etc/defaults/ddns-updater.conf
+  $HOME/.ddns-updater
+
+  Internal files:
 
   $CONF/00.ip            Current ip
   $CONF/00.updated       contains YYYY-MM-DD HH:MM of last update"
@@ -98,9 +103,13 @@ HENET_FILE_LOG=$CONF/henet.log
 # Use prefix 00.* to make data files to appear first in ls(1)
 FILE_IP=$CONF/00.ip
 FILE_TIMESTAMP=$CONF/00.updated
+
+# Can be set in program configuration file
+
+URL_WHATSMYIP=ifconfig.co
 MSG_PREFIX="[DDNS-UPDATER] "
 CURL_OPTS="--max-time 10"
-WGET_OPTS=
+WGET_OPTS="--timeout=10"
 
 Version ()
 {
@@ -200,7 +209,7 @@ IpCurrent ()
     if [ "$TEST" ]; then
         echo "0.0.0.0"
     else
-        Webcall ifconfig.co
+        Webcall $URL_WHATSMYIP
     fi
 }
 
@@ -326,9 +335,20 @@ Duckdns ()
     Verbose "Info: Updating Duckdns...done"
 }
 
+ReadConfiguration ()
+{
+    [ -f /etc/defaults/ddns-updater.conf ] &&
+        . /etc/defaults/ddns-updater.conf
+
+    [ -f $HOME/.ddns-updater ] &&
+        . $HOME/.ddns-updater
+}
+
 Main ()
 {
     unset TEST
+
+    ReadConfiguration
 
     while :
     do
