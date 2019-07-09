@@ -24,9 +24,18 @@
 #       Dynamic DNS (DDNS) update client.
 #
 #       See --help. Configuration files must exist before use.
+#
+#   Style Guide
+#
+#       - Indentation: 4 spaces.
+#       - Global variables are capitalized.
+#       - The "local" keyword is not used for variables.
+#         It is not defined in POSIX /bin/sh although almost
+#         all linux shells have added the support. Some routers
+#         still may have older shells.
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0709.0430"
+VERSION="2019.0709.0449"
 LICENSE="GPL-2+"
 
 # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -45,6 +54,10 @@ do
         CONF=$dir
     fi
 done
+
+CONF_PRORRAM="\
+/etc/defaults/ddns-updater.conf \
+$HOME/.ddns-updater"
 
 HELP="\
 Synopsis: $0 [option]
@@ -174,6 +187,12 @@ IpPrevious ()
 Help ()
 {
     echo "$HELP" | sed "s,$HOME,~,g"
+}
+
+ConvertHOME ()
+{
+    # Instead of long /mount/some/home/USER, use "~"
+    echo $1 | sed "s,$HOME,~,"
 }
 
 Webcall ()
@@ -337,18 +356,18 @@ Duckdns ()
 
 ReadConfiguration ()
 {
-    [ -f /etc/defaults/ddns-updater.conf ] &&
-        . /etc/defaults/ddns-updater.conf
-
-    [ -f $HOME/.ddns-updater ] &&
-        . $HOME/.ddns-updater
+    for file in $CONF_PRORRAM
+    do
+        if [ -f "$file" ]; then
+            Verbose "Conf: $(ConvertHOME $file)"
+            . "$file"
+        fi
+    done
 }
 
 Main ()
 {
     unset TEST
-
-    ReadConfiguration
 
     while :
     do
@@ -396,6 +415,8 @@ Main ()
         esac
     done
 
+    ReadConfiguration
+
     if [ ! "$CONF" ] ; then
         Die "ERROR: No configuration directory: $CONFHOME"
     fi
@@ -415,6 +436,13 @@ Main ()
     fi
 
     if [ "$status" ]; then
+        for file in $CONF/*.conf
+        do
+            if [ -f "$file" ]; then
+                Verbose "Conf: $(ConvertHOME $file)"
+            fi
+        done
+
         date=$(cat $FILE_TIMESTAMP 2> /dev/null)
         str=" Last-updated: $date"
 
