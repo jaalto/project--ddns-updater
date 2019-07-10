@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0710.1750"
+VERSION="2019.0710.1751"
 LICENSE="GPL-2+"
 
 # -----------------------------------------------------------------------
@@ -463,8 +463,6 @@ ConfigFileStatus()
     for file in "$@"
     do
         [ -f "$file" ] || continue
-
-        
 
         if ConfigFileIsEnabled "$file"; then
             str="enabled  "
