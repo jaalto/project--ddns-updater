@@ -10,26 +10,25 @@ SYSTEM WIDE
 
    make install
 
-MANUAL INSTALL
+MINIMAL MANUAL INSTALL
 
-To install (as root)
-
-   # Install without the *.sh extension.
-   # System wide programs do not have extensions.
+   # Or:
+   # 1. copy the binary whereever you want, like $HOME
+   # 2. edit account's cron with "contab -e"
 
    install --mode=755 ddns-updater.sh /usr/local/bin/ddns-updater
    install --mode=644 cron.d/ddns-updater /etc/cron.d/
 
    mkdir --parents ~/.config/ddns-updater
 
-Note:
+INSTALL CONFIGURATION FILES
 
-  The configuration files can be installed in:
+   Choos one of these directories:
 
       $HOME/.config/ddns-updater/	   or
       /etc/ddns-updater/
 
-Configuration templates:
+INSTALL CONFIGURATION TEMPLATES
 
-   # Edit files after copying
+   # Edit after copying and enable each one manually
    cp conf/*.conf $HOME/.config/ddns-updater/
