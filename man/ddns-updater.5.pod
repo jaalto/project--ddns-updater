@@ -58,6 +58,12 @@ configuration files are set:
 
 =over 4
 
+=item B<-c, --conf NAME>
+
+Without path, the NAME refets to files in configuration directory.
+Without path and without the C<.conf> extension, this translates to NAME.conf
+in configuration directory. See FILES section.
+
 =item B<-f, --force>
 
 Force update even if IP is same.
@@ -68,7 +74,8 @@ Show status and exit.
 
 =item B<-S, --syslog>
 
-Send status to syslog. Can only be used by root.
+Send status to syslog. Can only be used by root and only useful from
+cron.
 
 =item B<-t, --test, --dry-run>
 
@@ -98,6 +105,10 @@ Show status, is update needed?
 
     ddns-updater --status
 
+Run only one configuration file NAME.conf
+
+    ddns-update --verbose --conf NAME[.conf]
+
 =head1 BUGS
 
 The program does not use non-POSIX featues like getopt(1) to parse
@@ -111,32 +122,12 @@ POSIX
 
 =head1 FILES
 
-Program initialization files (read in this order)
-
-  /etc/defaults/ddns-updater
-  $HOME/.ddns-updater
-
-The C<$CONF> refers to configuration directory. Search order:
+The configuration file directories:
 
   $HOME/.config/ddns-updater
   /etc/ddns-updater
 
-Configuration file for duckdns.org
-
-  $CONF/duckdns.conf
-  DUCKDNS_DOMAINS=host,host...
-  DUCKDNS_TOKEN=yourtoken
-
-Configuration file for dns.he.net
-
-  $CONF/henet.conf
-  HENET_DOMAIN=host.exmaple.com
-  HENET_PASS=password
-
-Internal house keeping files:
-
-  $CONF/00.ip            Current ip
-  $CONF/00.updated       contains YYYY-MM-DD HH:MM of last update"
+Only one of these is used at a time in the order of appearance.
 
 =head1 STANDARDS
 
