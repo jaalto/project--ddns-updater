@@ -33,9 +33,18 @@
 #         It is not defined in POSIX /bin/sh although almost
 #         all linux shells have added the support. Some routers
 #         still may have older shells.
+#
+#      Note, that program cannot expect to have GNU utilities and
+#      their options. This means using:
+#
+#           egrep ...  /dev/null 2>&1
+#
+#       Instead of calls like:
+#
+#           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0709.0449"
+VERSION="2019.0710.0834"
 LICENSE="GPL-2+"
 
 # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -103,15 +112,8 @@ FILES
 
   Internal files:
 
-  $CONF/00.ip            Current ip
-  $CONF/00.updated       contains YYYY-MM-DD HH:MM of last update"
-
-DUCKDNS_FILE_CONF=$CONF/duckdns.conf
-DUCKDNS_FILE_LOG=$CONF/duckdns.log
-DUCKDNS_URI_VERBOSE="&verbose=true"
-
-HENET_FILE_CONF=$CONF/henet.conf
-HENET_FILE_LOG=$CONF/henet.log
+  $CONF/00.ip            Last update - ip address
+  $CONF/00.updated       Last update - YYYY-MM-DD HH:MM"
 
 # Use prefix 00.* to make data files to appear first in ls(1)
 FILE_IP=$CONF/00.ip
@@ -124,38 +126,27 @@ MSG_PREFIX="[DDNS-UPDATER] "
 CURL_OPTS="--max-time 10"
 WGET_OPTS="--timeout=10"
 
-Version ()
+Version()
 {
     echo "$VERSION $LICENSE $AUTHOR $HOMEPAGE"
 }
 
-Verbose ()
+Verbose()
 {
     [ "$VERBOSE" ] && echo "$MSG_PREFIX$*"
 }
 
-Msg ()
+Msg()
 {
     echo "$MSG_PREFIX$*"
 }
 
-Warn ()
+Warn()
 {
     Msg "$*" >&2
 }
 
-Die ()
-{
-    Warn "$*"
-    exit 1
-}
-
-Date ()
-{
-    date "+%Y-%m-%d %H:%M"
-}
-
-SyslogWrite ()
+SyslogStatusWrite()
 {
    status=$1
    id=$2
@@ -172,30 +163,60 @@ SyslogWrite ()
     esac
 }
 
-Syslog ()
+SyslogStatus()
 {
     if [ "$SYSLOG" ]; then
-        SyslogWrite "$@"
+        SyslogStatusWrite "$@"
     fi
 }
 
-IpPrevious ()
+SyslogMsg()
+{
+    if [ "$SYSLOG" ]; then
+        logger -p local0.err    -t DDNS-MSG "$*"
+    fi
+}
+
+Log()
+{
+    Warn "$*"
+    SyslogMsg "$*"
+}
+
+Die()
+{
+    Warn "$*"
+    exit 1
+}
+
+Date()
+{
+    date "+%Y-%m-%d %H:%M"
+}
+
+ReadFileAsString()
+{
+    # Remove newlines
+    cat "$1" | tr '\n' ' ' | sed 's,[ \ŧ]*$,,'
+}
+
+IpPrevious()
 {
     cat $FILE_IP 2> /dev/null
 }
 
-Help ()
+Help()
 {
     echo "$HELP" | sed "s,$HOME,~,g"
 }
 
-ConvertHOME ()
+ConvertHOME()
 {
     # Instead of long /mount/some/home/USER, use "~"
     echo $1 | sed "s,$HOME,~,"
 }
 
-Webcall ()
+Webcall()
 {
     # ARGUMENTS: URL [LOGFILE]
     logfile=$2
@@ -223,7 +244,7 @@ Webcall ()
     fi
 }
 
-IpCurrent ()
+IpCurrent()
 {
     if [ "$TEST" ]; then
         echo "0.0.0.0"
@@ -232,146 +253,208 @@ IpCurrent ()
     fi
 }
 
-IsHenet ()
+ServiceLogFile ()
 {
-    [ -f "$HENET_FILE_CONF" ] || return 1
-    . $HENET_FILE_CONF
+    echo ${1%.*}.log
 }
 
-HenetStatus ()
+ServiceId ()
 {
-    [ -f "$HENET_FILE_LOG" ] || return 2
+    # /path/service.conf => service
+    id=${1##*/}
+    id=${id%.*}
+    echo "$id" | tr 'a-z' 'A-Z'
+}
 
-    if [ "$VERBOSE" ]; then
-        cat $HENET_FILE_LOG
+ServiceStatus()
+{(  # Run in a subshell.
+    # Isolate program from variables introduced by "sourcing"
+
+    ip=$1
+    file=$2
+    log=$(ServiceLogFile "$file")
+    id=$(ServiceId "$file")
+
+    if [ ! -f "$file" ]; then   # No configuration file?
+        return 0
     fi
 
-    # on success, either:
-    #   good 192.168.0.1
-    #   nochg 192.168.0.1
+    if [ ! -f "$log" ]; then   # configuration file but No updated uet
+        return 0
+    fi
 
-    [ "$VERBOSE" ] && cat $HENET_FILE_LOG
+    [ "$VERBOSE" ] && cat $log
 
-    str=$(cat $HENET_FILE_LOG | tr '\n' ' ' | sed 's,[ \ŧ]*$,,')
+    . "$file"       # Source configuration file
 
-    case "$str" in
-        *good*)
-            Syslog nochange DNS-HENET $ip
-            return 0
+    # Make sure variables got defined
+
+    if [ ! "$REGEXP_OK" ]; then
+        Log "ERROR: Missing variable REGEXP_OK in $file"
+    fi
+
+    if [ ! "$REGEXP_NOCHANGE" ]; then
+       Log "ERROR: Missing variable REGEXP_NOCHANGE in $file"
+    fi
+
+    if egrep "$REGEXP_NOCHANGE" "$log" > /dev/null 2>&1 ; then
+        SyslogStatus nochg DNS-HENET $ip
+        return 0
+    elif egrep "$REGEXP_OK" "$log" > /dev/null 2>&1 ; then
+        SyslogStatus good  DDNS-$id $ip
+        return 0
+    else
+        SyslogStatus error DDNS-$id $ip "$(ReadFileAsString $log)"
+        return 1
+    fi
+)}
+
+ServiceRunUpdate()
+{(  # Run in a subshell.
+    # Isolate program from variables introduced by "sourcing"
+
+    ip=$1
+    file=$2
+    log=$(ServiceLogFile "$file")
+    id=$(ServiceId "$file")
+
+    if [ ! -f "$file" ]; then  # No configuration file?
+        return 0
+    fi
+
+    [ "$VERBOSE" ] && cat $log
+
+    . "$file"       # Source the configuration file
+
+    # Make sure variables got defined
+
+    if [ ! "$URL" ]; then
+        Log "ERROR: Missing variable URL in $file"
+    fi
+
+    case "$URL" in
+        *WHATSMYIP*)
+            if [ ! "$ip" ]; then
+                Log "ERROR: Current ip address not available from $URL_WHATSMYIP. Skipped $file"
+                return 1
+            fi
+
+            URL=$(echo $URL | sed "s,WHATSMYIP,$ip,")
             ;;
-        *nochg*) Syslog good DNS-HENET $ip
-             return 0
-             ;;
-        *)  Syslog error DNS-HENET $ip "$str"
-            return 1
     esac
-}
 
-Henet ()
-{
-    ip=$1
-
-    domain=$(sed -e 's/[ \t]*//' $HENET_FILE_DOMAIN)
-    pass=$(cat $HENET_FILE_PASS)
-
-    if [ ! "$pass" ] ; then
-        Die "ERROR: no password in: $HENET_FILE_PASS"
-    fi
-
-    if [ ! "$domain" ]; then
-        Die "ERROR: No FQDN in: $HENET_FILE_DOMAIN"
-    fi
-
-    # https://dns.he.net/docs.html
-    # http://[your domain name]:[your password]@dyn.dns.he.net/nic/update?hostname=[your domain name]
-    # username is also the hostname
-    #
-    # https://dyn.dns.he.net/nic/update?hostname=$HOST&password=$PASS&myip=$IP"
-
-    url="https://$domain:$pass@dyn.dns.he.net/nic/update?hostname=$domain&myip=$ip"
-
-    Verbose "Info: Updating Henet..."
-    CURL_OPTS="--max-time=10 --ipv4" Webcall "$HENET_FILE_LOG" "$url"
-    Verbose "Info: Updating Henet...done"
-}
-
-IsDuckdns ()
-{
-    [ -f "$DUCKDNS_FILE_CONF" ] || return 1
-    . $DUCKDNS_FILE_CONF
-}
-
-DuckdnsStatus ()
-{
-    ip=$1
-
-    [ -f "$DUCKDNS_FILE_LOG" ] || return 2
-
-    [ "$VERBOSE" ] && cat $DUCKDNS_FILE_LOG
-
-    str=$(cat $DUCKDNS_FILE_LOG | tr '\n' ' ' | sed 's,[ \ŧ]*$,,')
-
-    case "$str" in
-        *NOCHANGE*)
-            Syslog nochange DNS-DUCK $ip
-            return 0
+    case "$URL" in
+        *[$]*)
+            Log "ERROR: Possibly unresolved variables in $URL at $file"
+            return 1
             ;;
-        OK*) Syslog good DNS-DUCK $ip
-             return 0
-             ;;
-        *)  Syslog error DNS-DUCK $ip "$str"
-            return 1
     esac
-}
 
-Duckdns ()
+    Verbose "Info: Updating $id"
+
+    Webcall "$URL" "$log"
+
+    Verbose "Info: Updating $id...done"
+)}
+
+ServiceRunConfig()
 {
     ip=$1
-    domains=$DUCKDNS_DOMAINS
-    token=$DUCKDNS_TOKEN
+    file=$2
 
-    if [ ! "$token" ] ; then
-        Die "ERROR: No DUCKDNS_TOKEN in $DUCKDNS_FILE_CONF"
-    fi
-
-    if [ ! "$domains" ]; then
-        Die "ERROR: No DUCKDNS_DOMAINS in $DUCKDNS_FILE_CONF"
-    fi
-
-    url="https://www.duckdns.org/update?domains=$domains&token=$token&ip=$ip$DUCKDNS_URI_VERBOSE"
-
-    Verbose "Info: Updating Duckdns..."
-    Webcall "$DUCKDNS_FILE_LOG" "$url"
-
-    # Add missing last NEWLINE
-    [ "$TEST" ] || echo >> $DUCKDNS_FILE_LOG
-
-    if [ "$VERBOSE" ]; then
-        # Delete empty lines
-        sed '/^[ \t]*$/d' $DUCKDNS_FILE_LOG
-    fi
-
-    Verbose "Info: Updating Duckdns...done"
+    ServiceRunUpdate "$ip" "$file"
+    ServiceStatus "$ip" "$file"
 }
 
-ReadConfiguration ()
+ServiceRunConfigList ()
 {
-    for file in $CONF_PRORRAM
+    ip="$1"
+    list="$2"
+
+    if [ ! "$TEST" ]; then
+        echo $ip > $FILE_IP
+        Date > $FILE_TIMESTAMP
+    fi
+
+    ret=0
+
+    for conffile in $list
     do
-        if [ -f "$file" ]; then
-            Verbose "Conf: $(ConvertHOME $file)"
-            . "$file"
+        id=$(ServiceId "$conffile")
+
+        ServiceRunConfig "$ip" "$conffile"
+        status=$?
+
+        if [ $status -ne 0 ]; then
+            ret=$?
+            Verbose "update status FAILED"
+        else
+            Verbose
+            Verbose "update status ok"
         fi
     done
+
+    return $ret
 }
 
-Main ()
+ConfigFilePath()
+{
+    file=$1
+
+    case "$file" in
+        */*) ;;  # Nothing, user supplied file
+        *)
+            file=${file%.*}.conf
+            file=$CONF/$file
+            ;;
+    esac
+
+    if [ ! -f "$file" ]; then
+        Log "WARN: No config file $file"
+        return 1
+    fi
+
+    echo "$file"
+}
+
+ConfiFileIsEnabled()
+{
+    egrep "^(ENABLED?=[\"']?yes|ENABLED?=1$)" "$1" > /dev/null 2>&1
+}
+
+ConfiFileList()
+{
+    list=
+
+    for file in $CONF/*.conf
+    do
+        [ -f "$file" ] || continue
+        ConfiFileIsEnabled "$file" || continue
+
+        list="$list $file"
+    done
+
+    [ "$list" ] || return 1
+
+    echo $list
+}
+
+Main()
 {
     unset TEST
+    conffiles=
 
     while :
     do
         case "$1" in
+            -c | --conf | --config)
+                shift
+                [ "$1" ] || Die "ERROR: Missing arg for --conf"
+                file=$(ConfigFilePath "$1")
+                [ "$file" ] || Die "ERROR: No config file found for $1"
+                shift
+                conffiles="$conffiles $file"
+                ;;
             -f | --force)
                 shift
                 FORCE=force
@@ -415,7 +498,7 @@ Main ()
         esac
     done
 
-    ReadConfiguration
+    # -----------------------------------------------------------------------
 
     if [ ! "$CONF" ] ; then
         Die "ERROR: No configuration directory: $CONFHOME"
@@ -425,6 +508,10 @@ Main ()
         Die "ERROR: No configuration directory: $CONF"
     fi
 
+    if [ ! "$conffiles" ]; then
+        conffiles=$(ConfiFileList)
+    fi
+
     ip_prev=$(IpPrevious)
     ip=$(IpCurrent)
 
@@ -432,15 +519,19 @@ Main ()
     Verbose "IP now: $ip"
 
     if [ ! "$ip" ] || [ "$ip" = "0.0.0.0" ] ; then
-        Warn "WARN: current IP address not available"
+        Verbose "WARN: current IP address not available"
     fi
 
+    if [ ! "$conffiles" ]; then
+        Die "ERROR: No enabled configuration files in $CONF"
+    fi
+
+    # -----------------------------------------------------------------------
+
     if [ "$status" ]; then
-        for file in $CONF/*.conf
+        for file in $conffiles
         do
-            if [ -f "$file" ]; then
-                Verbose "Conf: $(ConvertHOME $file)"
-            fi
+            Verbose "Conf: $(ConvertHOME $file)"
         done
 
         date=$(cat $FILE_TIMESTAMP 2> /dev/null)
@@ -465,29 +556,13 @@ Main ()
         return 0
     fi
 
+    # -----------------------------------------------------------------------
+
     if [ ! "$FORCE" ] && [ "$ip_prev" = "$ip" ]; then
-        Verbose "Info: Nothing to update"
+        Verbose "Info: IP nochange. Not updated."
         return 0
     else
-
-        if [ ! "$ip" ] && [ ! "$TEST" ]; then
-            Die "WARN: Cannot update. Current IP address not available"
-        fi
-
-        [ "$TEST" ] || echo $ip > $FILE_IP
-        [ "$TEST" ] || Date > $FILE_TIMESTAMP
-
-        done=
-        status=0
-
-        IsDuckdns && { Duckdns $ip ; DuckdnsStatus $ip; status=$? ; done=done ;}
-        IsHenet   && { Henet $ip ; HenetStatus $ip; status=$? ; done=done ; }
-
-        if [ ! "$done" ]; then
-            Die "WARN: No DDNS configuration files. See --help."
-        fi
-
-        return $status
+        ServiceRunConfigList "$ip" "$conffiles"
     fi
 }
 
