@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0710.1751"
+VERSION="2019.0710.1919"
 LICENSE="GPL-2+"
 
 # -----------------------------------------------------------------------
@@ -283,14 +283,14 @@ IpCurrent()
 
 ServiceLogFile ()
 {
-    echo ${1%.*}.log
+    echo ${1%.conf}.log
 }
 
 ServiceId ()
 {
     # /path/service.conf => service
     id=${1##*/}
-    id=${id%.*}
+    id=${id%.conf}
     echo "$id" | tr 'a-z' 'A-Z'
 }
 
@@ -436,7 +436,13 @@ ConfigFilePath()
     case "$file" in
         */*) ;;  # Nothing, user supplied file
         *)
-            file=${file%.*}.conf
+            case "$file" in
+                *.conf)
+                   ;;
+                *) file="$file.conf"
+                   ;;
+            esac
+
             file=$CONF/$file
             ;;
     esac
