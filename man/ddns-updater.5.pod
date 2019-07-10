@@ -72,6 +72,9 @@ Without path, the NAME refets to files in configuration directory.
 Without path and without the C<.conf> extension, this translates to NAME.conf
 in configuration directory. See FILES section.
 
+This option can be supplied multiple times to select configuration
+files to run.
+
 =item B<-f, --force>
 
 Force update even if IP is same.
