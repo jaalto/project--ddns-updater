@@ -73,6 +73,10 @@ in configuration directory. See FILES section.
 
 Force update even if IP is same.
 
+=item B<-l, --list>
+
+List status of configuration files and exit.
+
 =item B<-s, --status>
 
 Show status and exit.

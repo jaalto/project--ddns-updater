@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0710.1615"
+VERSION="2019.0710.1750"
 LICENSE="GPL-2+"
 
 # -----------------------------------------------------------------------
@@ -86,6 +86,7 @@ DESCRIPTION
 OPTIONS
   -c, --config NAME  Read configuration NAME (or path)
   -f, --force        Force update even if IP is same.
+  -l, --list         List status of configuration files and exit.
   -s, --status       Show status and exit.
   -S, --syslog       Send status to syslog. Only for root (in cron).
   -t, --test         Run in test mode. No network update.
@@ -448,9 +449,32 @@ ConfigFilePath()
     echo "$file"
 }
 
-ConfiFileIsEnabled()
+ConfigFileIsEnabled()
 {
-    egrep "^(ENABLED?=[\"']?yes|ENABLED?=1$)" "$1" > /dev/null 2>&1
+    egrep "^(ENABLED?=[\"\']?yes|ENABLED?=1$)" "$1" > /dev/null 2>&1
+}
+
+ConfigFileStatus()
+{
+   if [ ! "$1" ]; then  # No user specific files to check
+       set -- $CONF/*.conf
+   fi
+
+    for file in "$@"
+    do
+        [ -f "$file" ] || continue
+
+        
+
+        if ConfigFileIsEnabled "$file"; then
+            str="enabled  "
+        else
+            str="disabled "
+        fi
+
+        file=$(ConvertHOME "$file")
+        echo "$str$file"
+    done
 }
 
 ConfiFileList()
@@ -460,7 +484,7 @@ ConfiFileList()
     for file in $CONF/*.conf
     do
         [ -f "$file" ] || continue
-        ConfiFileIsEnabled "$file" || continue
+        ConfigFileIsEnabled "$file" || continue
 
         list="$list $file"
     done
@@ -489,6 +513,10 @@ Main()
                 [ "$file" ] || Die "ERROR: No config file found for $1"
                 shift
                 conffiles="$conffiles $file"
+                ;;
+            -l | --list)
+                shift
+                lsconf=lsconf
                 ;;
             -f | --force)
                 shift
@@ -547,8 +575,17 @@ Main()
         Die "ERROR: No configuration directory: $CONF"
     fi
 
+    if [ "$lsconf" ]; then
+        ConfigFileStatus "$conffiles"
+        return 0
+    fi
+
     if [ ! "$conffiles" ]; then
         conffiles=$(ConfiFileList)
+    fi
+
+    if [ ! "$conffiles" ]; then
+        Die "ERROR: No live configuration files available"
     fi
 
     ip_prev=$(IpPrevious)
@@ -559,10 +596,6 @@ Main()
 
     if [ ! "$ip" ] || [ "$ip" = "0.0.0.0" ] ; then
         Verbose "WARN: current IP address not available"
-    fi
-
-    if [ ! "$conffiles" ]; then
-        Die "ERROR: No enabled configuration files in $CONF"
     fi
 
     # -----------------------------------------------------------------------
