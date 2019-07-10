@@ -62,7 +62,7 @@ MANDIR8		= $(MANDIR)/man8
 
 PERL		= perl
 TAR		= tar
-TAR_OPT_NO	= --exclude='.build'	\
+TAR_OPT_EXCLUDE	= --exclude='.build'	\
 		  --exclude='.sinst'	\
 		  --exclude='.inst'	\
 		  --exclude='tmp'	\
@@ -92,7 +92,7 @@ INSTALL_OBJS_BIN = bin/$(BIN)
 INSTALL_OBJS_DOC = AUTHORS INSTALL README.rst
 INSTALL_OBJS_MAN = man/*.$(MANSECT)
 INSTALL_OBJS_CRON = cron.d/$(NAME)
-INSTALL_OBJS_CONF = conf/duckdns.conf conf/henet.conf
+INSTALL_OBJS_CONF = examples/*.conf
 INSTALL_OBJS_DEFAULTS = conf/$(NAME).conf
 
 all:
@@ -218,15 +218,6 @@ install-defaults:
 	[ ! "$(INSTALL_OBJS_DOC)" ] || \
 		$(INSTALL_DATA) $(INSTALL_OBJS_DEFAULTS) $(DEFAULTSDIR)
 
-install-conf:
-	# install-doc - Install configuration file templates (empty)
-	$(INSTALL_BIN) -d $(CONFDIR)
-
-	for f in $(INSTALL_OBJS_CONF); \
-	do \
-		[ -f "$(CONFDIR)/$$f" ] || install --mode=644 $$f $(CONFDIR) ; \
-	done
-
 install-doc:
 	# install-doc - Install documentation
 	$(INSTALL_BIN) -d $(DOCDIR)
@@ -234,9 +225,8 @@ install-doc:
 	[ ! "$(INSTALL_OBJS_DOC)" ] || \
 		$(INSTALL_DATA) $(INSTALL_OBJS_DOC) $(DOCDIR)
 
-	# No doc/ dir to install
-	# $(TAR) -C doc $(TAR_OPT_NO) --create --file=- . | \
-	# $(TAR) -C $(DOCDIR) --extract --file=-
+	$(TAR) $(TAR_OPT_EXCLUDE) --create --file=- $(INSTALL_OBJS_CONF) | \
+	$(TAR) -C $(DOCDIR) --extract --file=-
 
 install-man: man
 	# install-man - Install manual pages
@@ -262,7 +252,7 @@ install-bin:
 	done
 
 # Rule: install - Standard install
-install: install-bin install-conf install-defaults install-cron install-man install-doc
+install: install-bin install-defaults install-cron install-man install-doc
 
 # Rule: install-test - [maintainer] run test installation to tmp/
 install-test:
