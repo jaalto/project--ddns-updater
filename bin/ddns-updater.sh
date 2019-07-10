@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0710.0841"
+VERSION="2019.0710.0922"
 LICENSE="GPL-2+"
 
 # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -76,20 +76,21 @@ DESCRIPTION
   dns.he.net
 
 OPTIONS
-  -f, --force    Force update even if IP is same.
-  -s, --status   Show status and exit.
-  -S, --syslog   Send status to syslog.
-  -t, --test     Run in test mode. No network update.
-  -v, --verbose  Display verbose messages.
-  -V, --version  Display version information and exit.
-  -h, --help     Display short help.
+  -c, --config NAME  Read configuration NAME (or path)
+  -f, --force        Force update even if IP is same.
+  -s, --status       Show status and exit.
+  -S, --syslog       Send status to syslog. Only for root (in cron).
+  -t, --test         Run in test mode. No network update.
+  -v, --verbose      Display verbose messages.
+  -V, --version      Display version information and exit.
+  -h, --help         Display short help.
 
   Please note that stacking of short options is not supported. E.g.
   -v -f cannot be combined into -vf.
 
 DIRECTORIES
 
-  CONFDIR Configuration directories searched in order:
+  CONFDIR Configuration directory searched is one of:
 
   \$HOME/.config/ddns-updater
   /etc/ddns-updater
@@ -97,15 +98,9 @@ DIRECTORIES
 FILES
   Configuration files:
 
-  $CONF/duckdns.conf
-  DUCKDNS_DOMAINS=host,host...
-  DUCKDNS_TOKEN=yourtoken
+  $CONF/*.conf
 
-  $CONF/henet.conf
-  HENET_DOMAIN=host.exmaple.com
-  HENET_PASS=password
-
-  Program configuration file (read in this order):
+  Program's configuration file (read in this order):
 
   /etc/defaults/ddns-updater.conf
   $HOME/.ddns-updater

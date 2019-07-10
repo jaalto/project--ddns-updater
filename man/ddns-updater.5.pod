@@ -40,7 +40,7 @@
 
 =head1 NAME
 
-ddnd-updater - dynamic DNS (DDNS) update client
+ddnd-updater - a generic dynamic DNS (DDNS) update client
 
 =head1 SYNOPSIS
 
@@ -48,17 +48,22 @@ ddnd-updater - dynamic DNS (DDNS) update client
 
 =head1 DESCRIPTION
 
-Program updates IP address to following services, provided that
-configuration files are set:
+Program updates IP address to any service that can be updated using
+URL calls, provided that a configuration file exists. Some templates
+are provided for:
 
   http://duckdns.org
   http://dns.he.net
+
+To use a new DDNS service provider, consult their URL API
+documentation and write respective configurations file. It will be
+used next time the program is called.
 
 =head1 OPTIONS
 
 =over 4
 
-=item B<-c, --conf NAME>
+=item B<-c, --config NAME>
 
 Without path, the NAME refets to files in configuration directory.
 Without path and without the C<.conf> extension, this translates to NAME.conf
@@ -122,12 +127,35 @@ POSIX
 
 =head1 FILES
 
-The configuration file directories:
+=head2 Configuration files
+
+The configuration file directory C<CONF> is one of the following whichever
+exists first:
 
   $HOME/.config/ddns-updater
   /etc/ddns-updater
 
-Only one of these is used at a time in the order of appearance.
+The requirements for writing a configuration file are:
+
+  - Written in plain POSIX shell
+  - Variables that must be defined (note the uppercase):
+
+    # Update URL. Optional variable $WHATSMYIP is replaced with IP.
+    URL=...
+
+    # egrep(1) compatible regexp to check output of calling URL.
+    REGEXP_OK=...
+    REGEXP_NOCHANGE=...
+
+=head2 Program's configuration file
+
+  /etc/defaults/ddns-updater.conf
+  $HOME/.ddns-updater
+
+=head2 Internal files
+
+  $CONF/00.ip            Last update - ip address
+  $CONF/00.updated       Last update - YYYY-MM-DD HH:MM"
 
 =head1 STANDARDS
 
