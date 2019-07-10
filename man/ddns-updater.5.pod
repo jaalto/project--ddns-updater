@@ -49,11 +49,14 @@ ddnd-updater - a generic dynamic DNS (DDNS) update client
 =head1 DESCRIPTION
 
 Program updates IP address to any service that can be updated using
-URL calls, provided that a configuration file exists. Some templates
-are provided for:
+URL calls, provided that a configuration file exists. Templates
+are provided with the programs. Examples:
 
   http://duckdns.org
   http://dns.he.net
+  http://ddnss.de
+  ....
+  (Add your own. See section CONFIGURATION FILES)
 
 To use a new DDNS service provider, consult their URL API
 documentation and write respective configurations file. It will be
@@ -131,7 +134,7 @@ POSIX
 
 =head1 FILES
 
-=head2 Configuration files
+=head2 CONFIGURATION FILES
 
 The configuration file directory C<CONF> is one of the following whichever
 exists first:
@@ -151,12 +154,12 @@ The requirements for writing a configuration file are:
     REGEXP_OK=...
     REGEXP_NOCHANGE=...
 
-=head2 Program's configuration file
+=head2 CONFIGURATION FILE FOR THE PRORAM
 
   /etc/defaults/ddns-updater.conf
   $HOME/.ddns-updater
 
-=head2 Internal files
+=head2 INTERNAL FILES
 
   $CONF/00.ip            Last update - ip address
   $CONF/00.updated       Last update - YYYY-MM-DD HH:MM"
