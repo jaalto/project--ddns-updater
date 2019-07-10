@@ -1,1 +1,1 @@
-*/30 * * * * ddns-updater --syslog
+*/30 * * * * root { test -x /usr/bin/ddns-updater || test -x /usr/local/bin/ddns-updater ; } && ddns-updater --syslog
