@@ -44,8 +44,12 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0710.0922"
+VERSION="2019.0710.1615"
 LICENSE="GPL-2+"
+
+# -----------------------------------------------------------------------
+# CONFIGURATION DIRECRECTORIES
+# -----------------------------------------------------------------------
 
 # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 
@@ -67,6 +71,10 @@ done
 CONF_PRORRAM="\
 /etc/defaults/ddns-updater.conf \
 $HOME/.ddns-updater"
+
+# -----------------------------------------------------------------------
+# HELP
+# -----------------------------------------------------------------------
 
 HELP="\
 Synopsis: $0 [option]
@@ -110,16 +118,34 @@ FILES
   $CONF/00.ip            Last update - ip address
   $CONF/00.updated       Last update - YYYY-MM-DD HH:MM"
 
-# Use prefix 00.* to make data files to appear first in ls(1)
+# -----------------------------------------------------------------------
+# GLOBAL VARIABLES
+# -----------------------------------------------------------------------
+
+LOGGER=    # Syslog support. In debian this is in package bsdutils
+
+if [ -x /usr/bin/logger ]; then
+    LOGGER=logger
+else
+    tmp=$(which logger 2> /dev/null)
+    [ "$tmp" ] && LOGGER=$tmp
+fi
+
+# Use prefix 00.* for files to appear first in ls(1) listing
+
 FILE_IP=$CONF/00.ip
 FILE_TIMESTAMP=$CONF/00.updated
 
-# Can be set in program configuration file
+# Can be set in program's configuration file <program>.conf
 
 URL_WHATSMYIP=ifconfig.co
 MSG_PREFIX="[DDNS-UPDATER] "
 CURL_OPTS="--max-time 10"
 WGET_OPTS="--timeout=10"
+
+# -----------------------------------------------------------------------
+# FUNCTIONS
+# -----------------------------------------------------------------------
 
 Version()
 {
@@ -143,18 +169,20 @@ Warn()
 
 SyslogStatusWrite()
 {
-   status=$1
-   id=$2
-   ip=$3
-   msg=$4
+    status=$1
+    id=$2
+    ip=$3
+    msg=$4
+
+    [ "$LOGGER" ] || return 1
 
     case "$status" in
       *good*)
-        logger -p local0.info   -t $id "OK: $ip address updated$msg" ;;
+        $LOGGER -p local0.info   -t $id "OK: $ip address updated$msg" ;;
       *nochange*)
-        logger -p local0.notice -t $id "OK: $ip address no change$msg" ;;
+        $LOGGER -p local0.notice -t $id "OK: $ip address no change$msg" ;;
       *)
-        logger -p local0.err    -t $id "ERROR: $ip address not updated$msg" ;;
+        $LOGGER -p local0.err    -t $id "ERROR: $ip address not updated$msg" ;;
     esac
 }
 
@@ -247,6 +275,10 @@ IpCurrent()
         Webcall $URL_WHATSMYIP
     fi
 }
+
+# -----------------------------------------------------------------------
+# FUNCTIONS: SERVICE PROVIDER
+# -----------------------------------------------------------------------
 
 ServiceLogFile ()
 {
@@ -392,6 +424,10 @@ ServiceRunConfigList ()
     return $ret
 }
 
+# -----------------------------------------------------------------------
+# FUNCTIONS: CONFIGURATION FILES
+# -----------------------------------------------------------------------
+
 ConfigFilePath()
 {
     file=$1
@@ -434,6 +470,10 @@ ConfiFileList()
     echo $list
 }
 
+# -----------------------------------------------------------------------
+# MAIN
+# -----------------------------------------------------------------------
+
 Main()
 {
     unset TEST
@@ -460,7 +500,11 @@ Main()
                 ;;
             -S | --syslog)
                 shift
-                SYSLOG=syslog
+                if [ "$LOGGER" ]; then
+                    SYSLOG=syslog
+                else
+                    Warn "ERROR: logger(1) not found in PATH. Syslog not available."
+                fi
                 ;;
             -t | --test | --dry-run)
                 shift
