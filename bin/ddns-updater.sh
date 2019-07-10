@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0710.0834"
+VERSION="2019.0710.0841"
 LICENSE="GPL-2+"
 
 # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -542,7 +542,7 @@ Main()
         fi
 
         if [ "$ip_prev" = "$ip" ]; then
-            Msg "OK IP: $ip (update not needed)$str"
+            Msg "OK IP: $ip nochange$str"
         else
             if [ "$ip_prev" ]; then
                 ip_prev="was $ip_prev"
