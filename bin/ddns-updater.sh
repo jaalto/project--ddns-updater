@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0711.0652"
+VERSION="2019.0711.0654"
 LICENSE="GPL-2+"
 
 # -----------------------------------------------------------------------
@@ -618,7 +618,7 @@ Main()
         fi
 
         if [ "$ip_prev" = "$ip" ]; then
-            Msg "OK IP: $ip nochange$str"
+            Msg "status: OK IP: $ip nochange$str"
         else
             if [ "$ip_prev" ]; then
                 ip_prev="was $ip_prev"
@@ -626,7 +626,7 @@ Main()
                 ip_prev="previous IP UNKNOWN"
             fi
 
-            Msg "NOK IP: $ip (update needed, $ip_prev).$str"
+            Msg "status: NOK IP: $ip (update needed, $ip_prev).$str"
         fi
 
         return 0
