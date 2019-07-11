@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0710.1919"
+VERSION="2019.0711.0636"
 LICENSE="GPL-2+"
 
 # -----------------------------------------------------------------------
@@ -140,7 +140,7 @@ FILE_TIMESTAMP=$CONF/00.updated
 # Can be set in program's configuration file <program>.conf
 
 URL_WHATSMYIP=ifconfig.co
-MSG_PREFIX="[DDNS-UPDATER] "
+MSG_PREFIX="DDNS-UPDATER "
 CURL_OPTS="--max-time 10"
 WGET_OPTS="--timeout=10"
 
