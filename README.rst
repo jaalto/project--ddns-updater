@@ -7,9 +7,9 @@ DESCRIPTION
 
 A generic dynamic DNS (DDNS) update client implemented in POSIX shell.
 
-Any DDNS service provider that can be updated using HTTP or HTTPS call
-can be added. Consult API documention of those services to add
-support. Program includes few ready templates to start with:
+Any DDNS service provider providing HTTP or HTTPS update can be added.
+Consult API documention of those services to add support. Program
+includes few ready templates to start with:
 
 - http://dns.he.net  [1] (host your own DOMAIN and update using DDNS)
 - http://duckdns.org [2] (US, free third level domains)
