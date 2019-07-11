@@ -43,7 +43,7 @@ crondir		= $(confdir)/cron.d
 
 BINDIR		= $(DESTDIR)$(bindir)
 CONFDIR		= $(DESTDIR)$(confdir)/$(NAME)
-DEFAULTSDIR	= $(DESTDIR)$(confdir)/defaults
+DEFAULTSDIR	= $(DESTDIR)$(confdir)/default
 CRONDIR		= $(DESTDIR)$(crondir)
 DOCDIR		= $(DESTDIR)$(sharedir)/doc/$(PACKAGE_DOC)
 EXAMPLESDIR	= $(DOCDIR)/examples
