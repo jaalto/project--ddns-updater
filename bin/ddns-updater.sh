@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0711.0636"
+VERSION="2019.0711.0645"
 LICENSE="GPL-2+"
 
 # -----------------------------------------------------------------------
@@ -326,7 +326,8 @@ ServiceStatus()
     fi
 
     if egrep "$REGEXP_NOCHANGE" "$log" > /dev/null 2>&1 ; then
-        SyslogStatus nochg DNS-HENET $ip
+        # Disabled: do not add additional noise to syslog
+        # SyslogStatus nochange DNS-HENET $ip
         return 0
     elif egrep "$REGEXP_OK" "$log" > /dev/null 2>&1 ; then
         SyslogStatus good  DDNS-$id $ip
