@@ -5,12 +5,16 @@
 DESCRIPTION
 ===========
 
-A shell program to update IP address to Dynamic DNS (DDNS) services:
+A generic dynamic DNS (DDNS) update client implemented in POSIX shell.
+User can add any DDNS service provider which is controlled using HTTP
+or HTTPS call. Please consult API documention of those services.
+Program includes few ready templates for:
 
-- http://duckdns.org [1]
-- http://dns.he.net  [2]
+- http://dns.he.net  [1] (host your own DOMAIN and update using DDNS)
+- http://duckdns.org [2] (US, free third level domains)
+- http://dsnss.de    [3] (EU, free third level domains)
 
-You need an account and domains from one of the services.
+See the examples/ directory.
 
 How does it work?
 -----------------
@@ -46,8 +50,9 @@ See details in separate INSTALL file.
 REFERENCES
 ==========
 
-- [1] Free DDNS hosting at https://www.duckdns.org/spec.jsp
-- [2] Hurricane Electric Free DDNS hosting in Europe. https://dns.he.net
+- [1] Hurricane Electric https://dns.he.net/docs.html
+- [2] https://www.duckdns.org/spec.jsp
+- [3] https://ddnss.de/ua/help.php
 
 COPYRIGHT AND LICENSE
 =====================
