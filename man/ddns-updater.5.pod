@@ -131,6 +131,8 @@ options. Due to lack of proper programing language constructs in POSIX
 shell, combining short options in form of B<-vf> is not supported. Use
 separate options like in B<-f> B<-i>.
 
+Likewise the equal sign notation is not supported, like in B<-conf=NAME>.
+
 =head1 ENVIRONMENT
 
 POSIX
@@ -139,33 +141,40 @@ POSIX
 
 =head2 CONFIGURATION FILES
 
-The configuration file directory C<CONF> is one of the following whichever
-exists first:
+The configuration files are searched from followgin directories.
+Only the first one found is used:
 
   $HOME/.config/ddns-updater
   /etc/ddns-updater
 
-The requirements for writing a configuration file are:
+The configuration file requirements are:
 
-  - Written in plain POSIX shell
-  - Variables that must be defined (note the uppercase):
+  - Must end in extension *.conf
+  - Written in POSIX shell.
+  - Must defined following variables:
 
-    # Update URL. Optional variable $WHATSMYIP is replaced with IP.
+    # The complete Update URL.
+    # In the $URL, it's possible to use $WHATSMYIP for the current IP.
     URL=...
 
-    # egrep(1) compatible regexp to check output of calling URL.
+    # egrep(1) compatible regexps to check response of the URL call.
     REGEXP_OK=...
     REGEXP_NOCHANGE=...
 
 =head2 CONFIGURATION FILE FOR THE PRORAM
 
+Not required. Possible to adust e.g. C<CULR_OPTIONS> for timeout,
+<URL_WHATSMYIP> to query IP etc.
+
   /etc/defaults/ddns-updater.conf
   $HOME/.ddns-updater
 
-=head2 INTERNAL FILES
+=head2 GENERATED FILES
 
-  $CONF/00.ip            Last update - ip address
-  $CONF/00.updated       Last update - YYYY-MM-DD HH:MM"
+Written in the CONFIGURATION DIRECTORY.
+
+  00.ip            Last update - ip address
+  00.updated       Last update - YYYY-MM-DD HH:MM"
 
 =head1 STANDARDS
 
