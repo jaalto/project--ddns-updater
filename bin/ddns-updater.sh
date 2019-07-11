@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0711.0654"
+VERSION="2019.0711.0719"
 LICENSE="GPL-2+"
 
 # -----------------------------------------------------------------------
@@ -141,8 +141,8 @@ FILE_TIMESTAMP=$CONF/00.updated
 
 URL_WHATSMYIP=ifconfig.co
 MSG_PREFIX="DDNS-UPDATER "
-CURL_OPTS="--max-time 10"
-WGET_OPTS="--timeout=10"
+CURL_OPTIONS="--max-time 10"
+WGET_OPTIONS="--timeout=10"
 
 # -----------------------------------------------------------------------
 # FUNCTIONS
@@ -247,15 +247,15 @@ Webcall()
 
     if which curl > /dev/null 2>&1 ; then
         if [ "$logfile" ]; then
-            ${TEST:+echo} curl --silent --insecure --output "$logfile" $CURL_OPTS "$1"
+            ${TEST:+echo} curl --silent --insecure --output "$logfile" $CURL_OPTIONS "$1"
         else
-            ${TEST:+echo} curl --silent --insecure $CURL_OPTS "$1"
+            ${TEST:+echo} curl --silent --insecure $CURL_OPTIONS "$1"
         fi
     elif which wget > /dev/null 2>&1 ; then
         if [ "$logfile" ]; then
-            ${TEST:+echo} wget --quiet --output-document="$logfile" $WGET_OPTS "$1"
+            ${TEST:+echo} wget --quiet --output-document="$logfile" $WGET_OPTIONS "$1"
         else
-            ${TEST:+echo} wget --quiet $WGET_OPTS "$1"
+            ${TEST:+echo} wget --quiet $WGET_OPTIONS "$1"
         fi
     elif which lynx > /dev/null 2>&1 ; then
         if [ "$logfile" ]; then
