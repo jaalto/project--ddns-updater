@@ -6,9 +6,10 @@ DESCRIPTION
 ===========
 
 A generic dynamic DNS (DDNS) update client implemented in POSIX shell.
-User can add any DDNS service provider which is controlled using HTTP
-or HTTPS call. Please consult API documention of those services.
-Program includes few ready templates for:
+
+Any DDNS service provider that can be updated using HTTP or HTTPS call
+can be added. Consult API documention of those services to add
+support. Program includes few ready templates to start with:
 
 - http://dns.he.net  [1] (host your own DOMAIN and update using DDNS)
 - http://duckdns.org [2] (US, free third level domains)
