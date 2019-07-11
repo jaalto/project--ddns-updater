@@ -149,7 +149,7 @@ Only the first one found is used:
 
 The configuration file requirements are:
 
-  - Must end in extension *.conf
+  - Must use *.conf extension.
   - Written in POSIX shell.
   - Must defined following variables:
 
@@ -160,6 +160,9 @@ The configuration file requirements are:
     # egrep(1) compatible regexps to check response of the URL call.
     REGEXP_OK=...
     REGEXP_NOCHANGE=...
+
+B<Tip>: to keep track of things, name the configuration files
+according to domain names like "mine.duckdns.org.conf"
 
 =head2 CONFIGURATION FILE FOR THE PRORAM
 
