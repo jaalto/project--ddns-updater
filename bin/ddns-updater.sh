@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0711.0645"
+VERSION="2019.0711.0652"
 LICENSE="GPL-2+"
 
 # -----------------------------------------------------------------------
@@ -478,7 +478,7 @@ ConfigFileStatus()
         fi
 
         file=$(ConvertHOME "$file")
-        echo "$str$file"
+        Msg "$str$file"
     done
 }
 
@@ -582,7 +582,6 @@ Main()
 
     if [ "$lsconf" ]; then
         ConfigFileStatus "$conffiles"
-        return 0
     fi
 
     if [ ! "$conffiles" ]; then
