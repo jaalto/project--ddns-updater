@@ -12,21 +12,7 @@ SYSTEM WIDE
 
 MINIMAL MANUAL INSTALL
 
-   # Or:
-   # 1. copy the binary whereever you want, like $HOME
-   # 2. edit account's cron with "contab -e"
-
-   install --mode=755 bin/ddns-updater.sh /usr/local/bin/ddns-updater
-   install --mode=644 cron.d/ddns-updater /etc/cron.d/
-
-   mkdir --parents ~/.config/ddns-updater
-
-INSTALL CONFIGURATION FILES
-
-   Choos one of these directories:
-
-      $HOME/.config/ddns-updater/	   or
-      /etc/ddns-updater/
+   See install.sh
 
 INSTALL CONFIGURATION TEMPLATES
 
