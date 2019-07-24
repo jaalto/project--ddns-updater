@@ -582,6 +582,7 @@ Main()
 
     if [ "$lsconf" ]; then
         ConfigFileStatus "$conffiles"
+        return 0
     fi
 
     if [ ! "$conffiles" ]; then
