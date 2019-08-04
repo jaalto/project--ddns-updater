@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0711.0719"
+VERSION="2019.0804.1935"
 LICENSE="GPL-2+"
 
 # -----------------------------------------------------------------------
@@ -141,8 +141,8 @@ FILE_TIMESTAMP=$CONF/00.updated
 
 URL_WHATSMYIP=ifconfig.co
 MSG_PREFIX="DDNS-UPDATER "
-CURL_OPTIONS="--max-time 10"
-WGET_OPTIONS="--timeout=10"
+CURL_OPTIONS="--max-time 5"
+WGET_OPTIONS="--timeout=5"
 
 # -----------------------------------------------------------------------
 # FUNCTIONS
@@ -245,7 +245,7 @@ Webcall()
     # ARGUMENTS: URL [LOGFILE]
     logfile=$2
 
-    if which curl > /dev/null 2>&1 ; then
+    if false && which curl > /dev/null 2>&1 ; then
         if [ "$logfile" ]; then
             ${TEST:+echo} curl --silent --insecure --output "$logfile" $CURL_OPTIONS "$1"
         else
@@ -253,9 +253,9 @@ Webcall()
         fi
     elif which wget > /dev/null 2>&1 ; then
         if [ "$logfile" ]; then
-            ${TEST:+echo} wget --quiet --output-document="$logfile" $WGET_OPTIONS "$1"
+            ${TEST:+echo} wget --output-document="$logfile" $WGET_OPTIONS "$1" 2>&1
         else
-            ${TEST:+echo} wget --quiet $WGET_OPTIONS "$1"
+            ${TEST:+echo} wget --output-document=- $WGET_OPTIONS "$1" 2>&1
         fi
     elif which lynx > /dev/null 2>&1 ; then
         if [ "$logfile" ]; then
@@ -268,12 +268,22 @@ Webcall()
     fi
 }
 
+Whatsmyip ()
+{
+    Webcall $URL_WHATSMYIP |
+    awk '
+    /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+[ \t]*$/ {
+        print $1
+        exit
+    }'
+}
+
 IpCurrent()
 {
     if [ "$TEST" ]; then
         echo "0.0.0.0"
     else
-        Webcall $URL_WHATSMYIP
+        Whatsmyip
     fi
 }
 
