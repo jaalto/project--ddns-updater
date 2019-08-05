@@ -158,15 +158,15 @@ The configuration file requirements are:
   - Must defined following variables:
 
     # The complete Update URL.
-    # In the $URL, it's possible to use $WHATSMYIP for the current IP.
+    # In the $URL, it's possible to use literal WHATSMYIP for the current IP.
     URL=...
 
     # egrep(1) compatible regexps to check response of the URL call.
     REGEXP_OK=...
     REGEXP_NOCHANGE=...
 
-B<Tip>: to keep track of things, name the configuration files
-according to domain names like "mine.duckdns.org.conf"
+B<Tip>: name the configuration files
+according to domain names like "me.duckdns.org.conf"
 
 =head2 CONFIGURATION FILE FOR THE PRORAM
 
