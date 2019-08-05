@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0805.0746"
+VERSION="2019.0805.2128"
 LICENSE="GPL-2+"
 
 PROGRAM=ddns-updater
@@ -189,13 +189,12 @@ Warn()
 Which ()
 {
     # retruns status code only
-    which $tmp > /dev/null 2>&1
+    which "$1" > /dev/null 2>&1
 }
 
 EmptyFile ()
 {
-    rm -f "$1"
-    touch "$1"
+    : > "$1"   # The True operator. An echo would add a newline.
 }
 
 SyslogStatusWrite()
@@ -276,7 +275,6 @@ Webcall()
 {
     # ARGUMENTS: URL [LOGFILE]
     logfile=$2
-    tmp=$TMPBASE.webcall
 
     echo "Webcall() $*" >> "$FILE_LOG"
 
@@ -300,18 +298,24 @@ Webcall()
             lynx --dump "$2" 2>> "$FILE_LOG"
         fi
     else
-        Die "ERROR: No programs to access web: curl, wget or lynx"
+        Die "ERROR: Not any programs found in PATH: curl, wget or lynx"
     fi
 }
 
 Whatsmyip ()
 {
-    Webcall $URL_WHATSMYIP |
+    tmpwhatsmyip="$TMPBASE.whatsmyip"
+
+    # Can't use pipe. Might call Die()
+    Webcall $URL_WHATSMYIP > "$tmpwhatsmyip"
+
+    [ -s "$tmpwhatsmyip" ] || return 1
+
     awk '
     /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+[ \t]*$/ {
         print $1
         exit
-    }'
+    }' "$tmpwhatsmyip"
 }
 
 IpCurrent()
@@ -556,7 +560,7 @@ Require ()
         Which $tmp && return 0
     done
 
-    Die "ERROR: Please install either curl, wget or lynx in PATH"
+    Die "ERROR: Not any found in PATH: curl, wget or lynx in PATH"
 
     unset tmp
 }
@@ -565,6 +569,8 @@ Main()
 {
     unset TEST
     conffiles=
+    tmpmain="$TMPBASE.Main"
+    showlog=
 
     while :
     do
@@ -583,13 +589,7 @@ Main()
                 ;;
             -L | --log)
                 shift
-                if [ -f "$FILE_LOG" ]; then
-                    ls -l "$FILE_LOG"
-                    cat "$FILE_LOG"
-                else
-                    Echo "No log file $FILE_LOG"
-                fi
-                return 0
+                showlog=showlog
                 ;;
             -f | --force)
                 shift
@@ -661,8 +661,14 @@ Main()
         Die "ERROR: No live configuration files available"
     fi
 
+    # -----------------------------------------------------------------------
+
+    EmptyFile "$FILE_LOG"
+
     ip_prev=$(IpPrevious)
-    ip=$(IpCurrent)
+
+    IpCurrent > "$tmpmain"     # Might call exit. Can't subshell $()
+    ip=$(cat "$tmpmain")
 
     Verbose "IP old: $ip_prev"
     Verbose "IP now: $ip"
@@ -701,6 +707,16 @@ Main()
         return 0
     fi
 
+    if [ "$showlog" ]; then
+        if [ -f "$FILE_LOG" ]; then
+            ls -l "$FILE_LOG"
+            cat "$FILE_LOG"
+        else
+            Echo "No log file $FILE_LOG"
+        fi
+        return 0
+    fi
+
     # -----------------------------------------------------------------------
 
     [ "$ip" ] || return 1
@@ -709,7 +725,6 @@ Main()
         Verbose "Info: IP nochange. Not updated."
         return 0
     else
-	EmptyFile "$FILE_LOG"
         ServiceRunConfigList "$ip" "$conffiles"
     fi
 }
