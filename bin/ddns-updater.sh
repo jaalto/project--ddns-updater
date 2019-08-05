@@ -280,20 +280,20 @@ Webcall()
 
     echo "Webcall() $*" >> "$FILE_LOG"
 
-    if false && which curl > /dev/null 2>&1 ; then
+    if Which curl ; then
         if [ "$logfile" ]; then
             ${TEST:+echo} curl --silent --insecure --output "$logfile" $CURL_OPTIONS "$1" 2>> "$FILE_LOG"
         else
             ${TEST:+echo} curl --silent --insecure $CURL_OPTIONS "$1" 2>> "$FILE_LOG"
         fi
-    elif which wget > /dev/null 2>&1 ; then
+    elif Which wget ; then
         if [ "$logfile" ]; then
             # Filter out the status message
             ${TEST:+echo} wget --no-verbose --output-document="$logfile" $WGET_OPTIONS "$1" 2>> "$FILE_LOG"
         else
             ${TEST:+echo} wget --no-verbose --output-document=- $WGET_OPTIONS "$1" 2>> "$FILE_LOG"
         fi
-    elif which lynx > /dev/null 2>&1 ; then
+    elif Which lynx ; then
         if [ "$logfile" ]; then
             lynx --dump "$2" > "$logfile" 2>> "$FILE_LOG"
         else
