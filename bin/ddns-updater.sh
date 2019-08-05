@@ -154,8 +154,8 @@ FILE_TIMESTAMP="$CONF/00.updated"
 
 URL_WHATSMYIP=ifconfig.co
 MSG_PREFIX="DDNS-UPDATER "
-CURL_OPTIONS="--max-time 5"
-WGET_OPTIONS="--timeout=5"
+CURL_OPTIONS="--max-time 15"
+WGET_OPTIONS="--timeout=15"
 
 # -----------------------------------------------------------------------
 # FUNCTIONS
