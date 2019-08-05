@@ -83,6 +83,10 @@ Force update even if IP is same.
 
 List status of configuration files and exit.
 
+=item B<-L --log>
+
+Display log and exit.
+
 =item B<-s, --status>
 
 Show status and exit.
@@ -177,6 +181,7 @@ Not required. Possible to adust e.g. C<CULR_OPTIONS> for timeout,
 Written in the CONFIGURATION DIRECTORY.
 
   00.ip            Last update - ip address
+  00.log           Last update - error log
   00.updated       Last update - YYYY-MM-DD HH:MM"
 
 =head1 STANDARDS
