@@ -44,8 +44,18 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0804.1935"
+VERSION="2019.0805.0746"
 LICENSE="GPL-2+"
+
+PROGRAM=ddns-updater
+
+# mktemp(1) would be an external program
+TMPDIR=${TMPDIR:-/tmp}
+TMPBASE=$TMPDIR/$PROGRAM.$$
+
+if [ ! "$PATH" ]; then
+    PATH="/usr/bin:/usr/local/bin"
+fi
 
 # -----------------------------------------------------------------------
 # CONFIGURATION DIRECRECTORIES
@@ -87,6 +97,7 @@ OPTIONS
   -c, --config NAME  Read configuration NAME (or path)
   -f, --force        Force update even if IP is same.
   -l, --list         List status of configuration files and exit.
+  -L, --log          Display log file and exit.
   -s, --status       Show status and exit.
   -S, --syslog       Send status to syslog. Only for root (in cron).
   -t, --test         Run in test mode. No network update.
@@ -117,6 +128,7 @@ FILES
   Internal files:
 
   $CONF/00.ip            Last update - ip address
+  $CONF/00.log           Last update - error log
   $CONF/00.updated       Last update - YYYY-MM-DD HH:MM"
 
 # -----------------------------------------------------------------------
@@ -134,8 +146,9 @@ fi
 
 # Use prefix 00.* for files to appear first in ls(1) listing
 
-FILE_IP=$CONF/00.ip
-FILE_TIMESTAMP=$CONF/00.updated
+FILE_IP="$CONF/00.ip"
+FILE_LOG="$CONF/00.log"
+FILE_TIMESTAMP="$CONF/00.updated"
 
 # Can be set in program's configuration file <program>.conf
 
@@ -147,6 +160,11 @@ WGET_OPTIONS="--timeout=5"
 # -----------------------------------------------------------------------
 # FUNCTIONS
 # -----------------------------------------------------------------------
+
+Atexit ()
+{
+    rm -f "$TMPBASE"*   # Clean up temporary files
+}
 
 Version()
 {
@@ -166,6 +184,18 @@ Msg()
 Warn()
 {
     Msg "$*" >&2
+}
+
+Which ()
+{
+    # retruns status code only
+    which $tmp > /dev/null 2>&1
+}
+
+EmptyFile ()
+{
+    rm -f "$1"
+    touch "$1"
 }
 
 SyslogStatusWrite()
@@ -226,7 +256,9 @@ ReadFileAsString()
 
 IpPrevious()
 {
-    cat $FILE_IP 2> /dev/null
+    [ -f "$FILE_IP" ] || return 1
+
+    cat "$FILE_IP" 2> /dev/null
 }
 
 Help()
@@ -244,24 +276,28 @@ Webcall()
 {
     # ARGUMENTS: URL [LOGFILE]
     logfile=$2
+    tmp=$TMPBASE.webcall
+
+    echo "Webcall() $*" >> "$FILE_LOG"
 
     if false && which curl > /dev/null 2>&1 ; then
         if [ "$logfile" ]; then
-            ${TEST:+echo} curl --silent --insecure --output "$logfile" $CURL_OPTIONS "$1"
+            ${TEST:+echo} curl --silent --insecure --output "$logfile" $CURL_OPTIONS "$1" 2>> "$FILE_LOG"
         else
-            ${TEST:+echo} curl --silent --insecure $CURL_OPTIONS "$1"
+            ${TEST:+echo} curl --silent --insecure $CURL_OPTIONS "$1" 2>> "$FILE_LOG"
         fi
     elif which wget > /dev/null 2>&1 ; then
         if [ "$logfile" ]; then
-            ${TEST:+echo} wget --output-document="$logfile" $WGET_OPTIONS "$1" 2>&1
+            # Filter out the status message
+            ${TEST:+echo} wget --no-verbose --output-document="$logfile" $WGET_OPTIONS "$1" 2>> "$FILE_LOG"
         else
-            ${TEST:+echo} wget --output-document=- $WGET_OPTIONS "$1" 2>&1
+            ${TEST:+echo} wget --no-verbose --output-document=- $WGET_OPTIONS "$1" 2>> "$FILE_LOG"
         fi
     elif which lynx > /dev/null 2>&1 ; then
         if [ "$logfile" ]; then
-            lynx --dump "$2" > "$logfile"
+            lynx --dump "$2" > "$logfile" 2>> "$FILE_LOG"
         else
-            lynx --dump "$2"
+            lynx --dump "$2" 2>> "$FILE_LOG"
         fi
     else
         Die "ERROR: No programs to access web: curl, wget or lynx"
@@ -513,6 +549,18 @@ ConfiFileList()
 # MAIN
 # -----------------------------------------------------------------------
 
+Require ()
+{
+    for tmp in curl wget lynx
+    do
+        Which $tmp && return 0
+    done
+
+    Die "ERROR: Please install either curl, wget or lynx in PATH"
+
+    unset tmp
+}
+
 Main()
 {
     unset TEST
@@ -532,6 +580,16 @@ Main()
             -l | --list)
                 shift
                 lsconf=lsconf
+                ;;
+            -L | --log)
+                shift
+                if [ -f "$FILE_LOG" ]; then
+                    echo "# $FILE_LOG"
+                    cat "$FILE_LOG"
+                else
+                    Echo "No log file $FILE_LOG"
+                fi
+                return 0
                 ;;
             -f | --force)
                 shift
@@ -621,7 +679,7 @@ Main()
             Verbose "Conf: $(ConvertHOME $file)"
         done
 
-        date=$(cat $FILE_TIMESTAMP 2> /dev/null)
+        date=$(cat "$FILE_TIMESTAMP" 2> /dev/null)
         str=" Last-updated: $date"
 
         if [ ! "$date" ]; then
@@ -645,14 +703,19 @@ Main()
 
     # -----------------------------------------------------------------------
 
+    [ "$ip" ] || return 1
+
     if [ ! "$FORCE" ] && [ "$ip_prev" = "$ip" ]; then
         Verbose "Info: IP nochange. Not updated."
         return 0
     else
+	EmptyFile "$FILE_LOG"
         ServiceRunConfigList "$ip" "$conffiles"
     fi
 }
 
+trap Atexit 0 1 2 3 5 15 19
+Require
 Main "$@"
 
 # End of file
