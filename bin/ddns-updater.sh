@@ -584,7 +584,7 @@ Main()
             -L | --log)
                 shift
                 if [ -f "$FILE_LOG" ]; then
-                    echo "# $FILE_LOG"
+                    ls -l "$FILE_LOG"
                     cat "$FILE_LOG"
                 else
                     Echo "No log file $FILE_LOG"
