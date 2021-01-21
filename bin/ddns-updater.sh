@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2019.0805.2128"
+VERSION="2021.0121.1125"
 LICENSE="GPL-2+"
 
 PROGRAM=ddns-updater
@@ -216,7 +216,7 @@ SyslogStatusWrite()
     esac
 }
 
-SyslogStatus()
+SyslogStatusUpdate()
 {
     if [ "$SYSLOG" ]; then
         SyslogStatusWrite "$@"
@@ -370,7 +370,7 @@ ServiceStatus()
         return 0
     fi
 
-    if [ ! -f "$log" ]; then   # configuration file but No updated uet
+    if [ ! -f "$log" ]; then   # configuration file but no update yet
         return 0
     fi
 
@@ -382,21 +382,23 @@ ServiceStatus()
 
     if [ ! "$REGEXP_OK" ]; then
         Log "ERROR: Missing variable REGEXP_OK in $file"
+        return 1
     fi
 
     if [ ! "$REGEXP_NOCHANGE" ]; then
        Log "ERROR: Missing variable REGEXP_NOCHANGE in $file"
+       return 1
     fi
 
     if egrep "$REGEXP_NOCHANGE" "$log" > /dev/null 2>&1 ; then
         # Disabled: do not add additional noise to syslog
-        # SyslogStatus nochange DNS-HENET $ip
+        # SyslogStatusUpdate nochange DNS-HENET $ip
         return 0
     elif egrep "$REGEXP_OK" "$log" > /dev/null 2>&1 ; then
-        SyslogStatus good  DDNS-$id $ip
+        SyslogStatusUpdate good  DDNS-$id $ip
         return 0
     else
-        SyslogStatus error DDNS-$id $ip "$(ReadFileAsString $log)"
+        SyslogStatusUpdate error DDNS-$id $ip "$(ReadFileAsString $log)"
         return 1
     fi
 )}
