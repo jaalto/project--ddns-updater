@@ -2,7 +2,7 @@
 #
 #   Copyright
 #
-#       Copyright (C) 2019 Jari Aalto <jari.aalto@cante.net>
+#       Copyright (C) 2019-2021 Jari Aalto <jari.aalto@cante.net>
 #
 #   License
 #
@@ -302,6 +302,23 @@ Webcall()
     fi
 }
 
+WhatsmyipParse ()
+{
+    # <p><code class="ip">81.4.110.124</code></p>
+    awk '
+    /code class=.*ip/ {
+	 sub("</code>.*","")
+	 sub("^.*>","")
+	 print
+	 exit
+     }
+     /^[ \t]*[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/ {
+	 print $1
+	 exit
+     }
+     ' "$@"
+}
+
 Whatsmyip ()
 {
     tmpwhatsmyip="$TMPBASE.whatsmyip"
@@ -311,11 +328,7 @@ Whatsmyip ()
 
     [ -s "$tmpwhatsmyip" ] || return 1
 
-    awk '
-    /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+[ \t]*$/ {
-        print $1
-        exit
-    }' "$tmpwhatsmyip"
+    WhatsmyipParse "$tmpwhatsmyip"
 }
 
 IpCurrent()
