@@ -24,7 +24,7 @@
 #       Simple install program. Default is to install under $HOME
 #       Adjust variables before calling:
 #
-#           test=1 BINDIR=/usr/local/bin CONFDIR=/etc/ddns-updated <program>
+#           test=1 BINDIR=/usr/local/bin CONFDIR=/etc/ddns-updater <program>
 
 BINDIR=${BINDIR:-$HOME/bin}
 
