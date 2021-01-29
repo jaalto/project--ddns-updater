@@ -44,8 +44,9 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2021.0121.1125"
+VERSION="2021.0129.1739"
 LICENSE="GPL-2+"
+HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
 PROGRAM=ddns-updater
 
