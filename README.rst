@@ -58,7 +58,7 @@ REFERENCES
 COPYRIGHT AND LICENSE
 =====================
 
-Copyright (C) 2019 Jari Aalto <jari.aalto@cante.net>
+Copyright (C) 2019-2021 Jari Aalto <jari.aalto@cante.net>
 
 This project is free; you can redistribute and/or modify it under
 the terms of GNU General Public license either version 2 of the
