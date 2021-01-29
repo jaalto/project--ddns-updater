@@ -65,6 +65,6 @@ the terms of GNU General Public license either version 2 of the
 License, or (at your option) any later version.
 
 Project homepage (bugs and source) is at
-https://github.com/jaalto/project--restricted-shell-rbash
+https://github.com/jaalto/project--ddns-updater
 
 .. End of file
