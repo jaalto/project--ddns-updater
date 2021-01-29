@@ -155,7 +155,7 @@ The configuration file requirements are:
 
   - Must use *.conf extension.
   - Written in POSIX shell.
-  - Must defined following variables:
+  - Must define following variables:
 
     # The complete Update URL.
     # In the $URL, it's possible to use literal WHATSMYIP for the current IP.
