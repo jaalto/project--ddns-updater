@@ -31,10 +31,10 @@ BINDIR=${BINDIR:-$HOME/bin}
 Run ()
 {
     if [ "$test" ]; then
-	echo "$*"
+        echo "$*"
     else
-	echo "# $*"
-	"$@"
+        echo "# $*"
+        "$@"
     fi
 }
 
@@ -53,13 +53,13 @@ fi
 
 case "$BINDIR" in
     /usr/local/bin* | /usr/bin*)
-	Run cp cron.d/ddns-updater /etc/cron.d/
-	;;
-    *)	
-	echo "\
+        Run cp cron.d/ddns-updater /etc/cron.d/
+        ;;
+    *)
+        echo "\
 # DONE. Add a cron entry with: crontatab -e
 # See an example in file: cron.d/ddns-updater"
-	;;
+        ;;
 esac
 
 # End of file
