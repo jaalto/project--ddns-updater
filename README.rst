@@ -20,18 +20,21 @@ See the examples/ directory.
 How does it work?
 -----------------
 
-Based on your domains and credentials, it periodically checks if IP address
-has changed and sends an update request.
+Based on configured domains and credentials, the program periodically
+checks if IP address has changed and sends update requests. for each
+DDNS service provider:
 
 1. Create a user account.
 
-2. Add domain(s) to your account.
+2. Select provided domain(s).
 
-3. Copy the TOKEN or PASSWORD from your account depending on used DDNS service.
+3. Copy the TOKEN or PASSWORD information to access your domain(s).
 
-4. Configure update interval for a cron job.
+4. Update configuration files for each domain.
 
-After setting up configuration files, call program once from command
+5. Configure update interval for a cron job.
+
+After setting up configuration files, call program once from the command
 line to seed the initial IP. After that cron takes care of updates. ::
 
     /usr/local/bin/ddns-updater --verbose
@@ -41,7 +44,7 @@ REQUIREMENTS
 
 1. POSIX environment and standard utilities (grep, awk...)
 
-2. POSIX ``/bin/sh`` and some web client like ``curl(1)``, ``wget(1)`` etc.
+2. POSIX ``/bin/sh`` and web client like ``curl(1)`` or ``wget(1)``.
 
 INSTALL
 =======
