@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1023"
+VERSION="2024.0412.1031"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -59,6 +59,8 @@ TMPBASE=${TMPDIR:-/tmp}/${LOGNAME:-$USER}.$$.ddns-updater.tmp
 if [ ! "$PATH" ]; then
     PATH="/usr/bin:/usr/local/bin"
 fi
+
+GREP="egrep"
 
 # -----------------------------------------------------------------------
 # CONFIGURATION DIRECRECTORIES
@@ -436,11 +438,11 @@ ServiceStatus ()
        return 1
     fi
 
-    if egrep "$REGEXP_NOCHANGE" "$log" > /dev/null 2>&1 ; then
+    if $GREP "$REGEXP_NOCHANGE" "$log" > /dev/null 2>&1 ; then
         # Disabled: do not add additional noise to syslog
         # SyslogStatusUpdate nochange DNS-HENET $ip
         return 0
-    elif egrep "$REGEXP_OK" "$log" > /dev/null 2>&1 ; then
+    elif $GREP "$REGEXP_OK" "$log" > /dev/null 2>&1 ; then
         SyslogStatusUpdate good  DDNS-$id $ip
         return 0
     else
@@ -569,13 +571,13 @@ ConfigFilePath ()
 
 ConfigFileIsEnabled ()
 {
-    egrep "^(ENABLED?=[\"\']?yes|ENABLED?=1$)" "$1" > /dev/null 2>&1
+    $GREP "^(ENABLED?=[\"\']?yes|ENABLED?=1$)" "$1" > /dev/null 2>&1
 }
 
 ConfigFileStatus ()
 {
    if [ ! "$1" ]; then  # No user specific files to check
-       set -- $CONF/*.conf
+       set -- "$CONF"/*.conf
    fi
 
     for file in "$@"
@@ -632,6 +634,16 @@ Main ()
     unset conffiles
     unset showlog
     tmpmain="$TMPBASE.Main"
+
+    # egrep is beging deprecated. Check.
+
+    if ! Which egrep; then
+        if grep --version 2> /dev/null | grep "GNU" > /dev/null; then
+            GREP="grep --extended-regexp"
+        else
+            Verbose "WARN: egrep not in PATH, switching 'grep -E' (please install GNU grep if this does not work)"
+        fi
+    fi
 
     # Optional feature
 
