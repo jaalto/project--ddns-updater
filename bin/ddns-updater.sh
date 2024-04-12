@@ -44,11 +44,11 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.0957"
+VERSION="2024.0412.0958"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
-PROGRAM=ddns-updater
+PROGRAM=${0##*/}
 
 # mktemp(1) would be an external program
 TMPDIR=${TMPDIR:-/tmp}
