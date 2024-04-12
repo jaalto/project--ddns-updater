@@ -45,7 +45,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1113"
+VERSION="2024.0412.1127"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -100,6 +100,10 @@ OPTIONS
     -f, --force
         Force update even if IP is same.
 
+    -g, --get-ip IP
+        A URL to return current IP address.
+        Default: $URL_WHATSMYIP
+
     -l, --list
         List status of configuration files and exit.
 
@@ -107,8 +111,9 @@ OPTIONS
         Display log file and exit.
 
     -p, --persistent-data-dir DIR
-        Location where to save variable persistent data.
-        Default: $VARDIR
+        Location where to save variable persistent data
+        like current and uddated Ip addresses. See
+        FILES. Default: $VARDIR
 
     -s, --status
         Show status and exit.
@@ -200,6 +205,13 @@ IsUSerRoot ()
     [ "$(id --user)" = "0" ]
 }
 
+Which ()
+{
+    # "command -v" is POSIX
+    command -v "$1" > /dev/null 2>&1 || return 1
+    return 0
+}
+
 Verbose ()
 {
     [ "$VERBOSE" ] && echo "$MSG_PREFIX$*"
@@ -250,11 +262,37 @@ DieNoDir ()
     fi
 }
 
-Which ()
+DieOptionNotNumber ()
 {
-    # "command -v" is POSIX
-    command -v "$1" > /dev/null 2>&1 || return 1
-    return 0
+    case "$2" in
+        [0-9]*)
+            ;;
+        *)
+            Die "$PROGRAM ERROR: option $1 requires a number, got: $1"
+            ;;
+    esac
+}
+
+DieOptionMinus ()
+{
+    case "$2" in
+        -*)
+            Die "$PROGRAM ERROR: option $1 requires ARG, got $2"
+            ;;
+    esac
+}
+
+DieOptionEmpty ()
+{
+    if [ ! "$2" ]; then
+        Die "$PROGRAM ERROR: option $1 requires ARG, got empty"
+    fi
+}
+
+DieOption ()
+{
+    DieOptionMinus "$@"
+    DieOptionEmpty "$@"
 }
 
 MakeEmptyFile ()
@@ -695,6 +733,10 @@ Main ()
             -f | --force)
                 shift
                 FORCE=force
+                ;;
+            -g | --get-ip)
+                URL_WHATSMYIP=$2
+                shift 2
                 ;;
             -s | --status)
                 shift
