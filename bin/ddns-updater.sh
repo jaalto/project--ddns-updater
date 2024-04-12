@@ -2,7 +2,7 @@
 #
 #   Copyright
 #
-#       Copyright (C) 2019-2021 Jari Aalto <jari.aalto@cante.net>
+#       Copyright (C) 2019-2024 Jari Aalto <jari.aalto@cante.net>
 #
 #   License
 #
@@ -34,7 +34,7 @@
 #         all linux shells have added the support. Some routers
 #         still may have older shells.
 #
-#      Note, that program cannot expect to have GNU utilities and
+#      Note: program cannot expect to have GNU utilities and
 #      their options. This means using:
 #
 #           egrep ...  /dev/null 2>&1
@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2021.0129.1739"
+VERSION="2024.0412.0953"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -167,30 +167,31 @@ Atexit ()
     rm -f "$TMPBASE"*   # Clean up temporary files
 }
 
-Version()
+Version ()
 {
     echo "$VERSION $LICENSE $AUTHOR $HOMEPAGE"
 }
 
-Verbose()
+Verbose ()
 {
     [ "$VERBOSE" ] && echo "$MSG_PREFIX$*"
 }
 
-Msg()
+Msg ()
 {
     echo "$MSG_PREFIX$*"
 }
 
-Warn()
+Warn ()
 {
     Msg "$*" >&2
 }
 
 Which ()
 {
-    # retruns status code only
-    which "$1" > /dev/null 2>&1
+    # "command -v" is POSIX
+    command -v "$1" > /dev/null 2>&1 || return 1
+    return 0
 }
 
 EmptyFile ()
@@ -375,9 +376,9 @@ ServiceStatus()
         return 0
     fi
 
-    [ "$VERBOSE" ] && cat $log
+    [ "$VERBOSE" ] && cat "$log"
 
-    . "$file"       # Source configuration file
+    . "$file"      # Source configuration file
 
     # Make sure variables got defined
 
