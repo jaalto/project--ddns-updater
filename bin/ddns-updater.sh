@@ -45,7 +45,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1129"
+VERSION="2024.0412.1139"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -85,6 +85,30 @@ do
 done
 
 VARDIR=$CONF
+
+# -----------------------------------------------------------------------
+# GLOBAL VARIABLES
+# -----------------------------------------------------------------------
+
+LOGGER=    # Syslog support. Debian: "apt-get install bsdutils"
+
+# Use prefix 00.* for files to appear first in ls(1) listing
+
+PREFIX="00.ddns-updater.ip"
+FILE_IP="$VARDIR/$PREFIX.now"
+FILE_LOG="$VARDIR/$PREFIX.log"
+FILE_TIMESTAMP="$VARDIR/$PREFIX.updated"
+
+# Can be set in program's configuration file <program>.conf
+
+URL_WHATSMYIP=ifconfig.co
+MSG_PREFIX="DDNS-UPDATER "
+CURL_OPTIONS="--max-time 15"
+WGET_OPTIONS="--timeout=15"
+
+# -----------------------------------------------------------------------
+# FUNCTIONS
+# -----------------------------------------------------------------------
 
 # -----------------------------------------------------------------------
 # HELP
@@ -147,43 +171,20 @@ DIRECTORIES
     /etc/ddns-updater
 
 FILES
-    Configuration files:
+    Read configuration files:
 
     $CONF/*.conf
 
-    Program's configuration file (read in this order):
+    Written files:
 
-    /etc/defaults/ddns-updater.conf
-    $HOME/.ddns-updater
+    $FILE_IP
+        Last update - ip address
 
-    Internal files:
+    $FILE_LOG
+        Last update - error log
 
-    $VARDIR/00.ip            Last update - ip address
-    $VARDIR/00.log           Last update - error log
-    $VARDIR/00.updated       Last update - YYYY-MM-DD HH:MM"
-
-# -----------------------------------------------------------------------
-# GLOBAL VARIABLES
-# -----------------------------------------------------------------------
-
-LOGGER=    # Syslog support. Debian: "apt-get install bsdutils"
-
-# Use prefix 00.* for files to appear first in ls(1) listing
-
-FILE_IP="$VARDIR/00.ip"
-FILE_LOG="$VARDIR/00.log"
-FILE_TIMESTAMP="$VARDIR/00.updated"
-
-# Can be set in program's configuration file <program>.conf
-
-URL_WHATSMYIP=ifconfig.co
-MSG_PREFIX="DDNS-UPDATER "
-CURL_OPTIONS="--max-time 15"
-WGET_OPTIONS="--timeout=15"
-
-# -----------------------------------------------------------------------
-# FUNCTIONS
-# -----------------------------------------------------------------------
+    $FILE_TIMESTAMP
+        Last update - YYYY-MM-DD HH:MM"
 
 Help ()
 {
