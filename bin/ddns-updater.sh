@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1020"
+VERSION="2024.0412.1021"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -301,7 +301,7 @@ Date ()
 ReadFileAsString ()
 {
     # Remove newlines
-    cat "$1" | tr '\n' ' ' | sed 's,[ \ŧ]*$,,'
+    tr '\n' ' ' < "$1" | sed 's,[ \t]*$,,'
 }
 
 IpPrevious ()
