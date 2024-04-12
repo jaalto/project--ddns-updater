@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1019"
+VERSION="2024.0412.1020"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -283,7 +283,7 @@ SyslogStatusUpdate ()
 SyslogMsg ()
 {
     if [ "$SYSLOG" ]; then
-        logger -p local0.err    -t DDNS-MSG "$*"
+        logger --priority local0.err --tag DDNS-MSG "$*"
     fi
 }
 
