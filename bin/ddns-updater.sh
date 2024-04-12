@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1047"
+VERSION="2024.0412.1049"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -611,7 +611,7 @@ ConfiFileList ()
 {
     list=
 
-    for file in $CONF/*.conf
+    for file in "$CONF"/*.conf
     do
         [ -f "$file" ] || continue
         ConfigFileIsEnabled "$file" || continue
@@ -621,7 +621,7 @@ ConfiFileList ()
 
     [ "$list" ] || return 1
 
-    echo $list
+    echo "$list"
 }
 
 # -----------------------------------------------------------------------
