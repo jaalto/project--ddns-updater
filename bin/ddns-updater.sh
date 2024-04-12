@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1044"
+VERSION="2024.0412.1045"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -494,7 +494,7 @@ ServiceRunUpdate ()
                 return 1
             fi
 
-            URL=$(echo $URL | sed "s,WHATSMYIP,$ip,")
+            URL=$(echo "$URL" | sed "s,WHATSMYIP,$ip,")
             ;;
     esac
 
