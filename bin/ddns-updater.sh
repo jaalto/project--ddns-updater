@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1016"
+VERSION="2024.0412.1019"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -258,12 +258,18 @@ SyslogStatusWrite ()
     [ "$LOGGER" ] || return 1
 
     case "$status" in
-      *good*)
-        $LOGGER -p local0.info   -t $id "OK: $ip address updated$msg" ;;
-      *nochange*)
-        $LOGGER -p local0.notice -t $id "OK: $ip address no change$msg" ;;
-      *)
-        $LOGGER -p local0.err    -t $id "ERROR: $ip address not updated$msg" ;;
+        *good*)
+            $LOGGER --priority local0.info \
+                --tag "$id" "OK: $ip address updated$msg"
+            ;;
+        *nochange*)
+            $LOGGER --priority local0.notice \
+                --tag "$id" "OK: $ip address no change$msg"
+            ;;
+        *)
+            $LOGGER --priority local0.err \
+                --tag "$id" "ERROR: $ip address not updated$msg"
+            ;;
     esac
 }
 
