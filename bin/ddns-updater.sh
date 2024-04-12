@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.0953"
+VERSION="2024.0412.0955"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -187,6 +187,12 @@ Warn ()
     Msg "$*" >&2
 }
 
+Die ()
+{
+    Warn "$*"
+    exit 1
+}
+
 Which ()
 {
     # "command -v" is POSIX
@@ -199,7 +205,7 @@ EmptyFile ()
     : > "$1"   # The True operator. An echo would add a newline.
 }
 
-SyslogStatusWrite()
+SyslogStatusWrite ()
 {
     status=$1
     id=$2
@@ -218,62 +224,56 @@ SyslogStatusWrite()
     esac
 }
 
-SyslogStatusUpdate()
+SyslogStatusUpdate ()
 {
     if [ "$SYSLOG" ]; then
         SyslogStatusWrite "$@"
     fi
 }
 
-SyslogMsg()
+SyslogMsg ()
 {
     if [ "$SYSLOG" ]; then
         logger -p local0.err    -t DDNS-MSG "$*"
     fi
 }
 
-Log()
+Log ()
 {
     Warn "$*"
     SyslogMsg "$*"
 }
 
-Die()
-{
-    Warn "$*"
-    exit 1
-}
-
-Date()
+Date ()
 {
     date "+%Y-%m-%d %H:%M"
 }
 
-ReadFileAsString()
+ReadFileAsString ()
 {
     # Remove newlines
     cat "$1" | tr '\n' ' ' | sed 's,[ \ŧ]*$,,'
 }
 
-IpPrevious()
+IpPrevious ()
 {
     [ -f "$FILE_IP" ] || return 1
 
     cat "$FILE_IP" 2> /dev/null
 }
 
-Help()
+Help ()
 {
     echo "$HELP" | sed "s,$HOME,~,g"
 }
 
-ConvertHOME()
+ConvertHOME ()
 {
     # Instead of long /mount/some/home/USER, use "~"
     echo $1 | sed "s,$HOME,~,"
 }
 
-Webcall()
+Webcall ()
 {
     # ARGUMENTS: URL [LOGFILE]
     logfile=$2
@@ -333,7 +333,7 @@ Whatsmyip ()
     WhatsmyipParse "$tmpwhatsmyip"
 }
 
-IpCurrent()
+IpCurrent ()
 {
     if [ "$TEST" ]; then
         echo "0.0.0.0"
@@ -359,7 +359,7 @@ ServiceId ()
     echo "$id" | tr 'a-z' 'A-Z'
 }
 
-ServiceStatus()
+ServiceStatus ()
 {(  # Run in a subshell.
     # Isolate program from variables introduced by "sourcing"
 
@@ -405,7 +405,7 @@ ServiceStatus()
     fi
 )}
 
-ServiceRunUpdate()
+ServiceRunUpdate ()
 {(  # Run in a subshell.
     # Isolate program from variables introduced by "sourcing"
 
@@ -453,7 +453,7 @@ ServiceRunUpdate()
     Verbose "Info: Updating $id...done"
 )}
 
-ServiceRunConfig()
+ServiceRunConfig ()
 {
     ip=$1
     file=$2
@@ -497,7 +497,7 @@ ServiceRunConfigList ()
 # FUNCTIONS: CONFIGURATION FILES
 # -----------------------------------------------------------------------
 
-ConfigFilePath()
+ConfigFilePath ()
 {
     file=$1
 
@@ -523,12 +523,12 @@ ConfigFilePath()
     echo "$file"
 }
 
-ConfigFileIsEnabled()
+ConfigFileIsEnabled ()
 {
     egrep "^(ENABLED?=[\"\']?yes|ENABLED?=1$)" "$1" > /dev/null 2>&1
 }
 
-ConfigFileStatus()
+ConfigFileStatus ()
 {
    if [ ! "$1" ]; then  # No user specific files to check
        set -- $CONF/*.conf
@@ -549,7 +549,7 @@ ConfigFileStatus()
     done
 }
 
-ConfiFileList()
+ConfiFileList ()
 {
     list=
 
@@ -582,7 +582,7 @@ Require ()
     unset tmp
 }
 
-Main()
+Main ()
 {
     unset TEST
     conffiles=
