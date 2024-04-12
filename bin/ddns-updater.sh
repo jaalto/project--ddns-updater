@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1051"
+VERSION="2024.0412.1054"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -632,10 +632,10 @@ Require ()
 {
     for tmp in curl wget lynx
     do
-        Which $tmp && return 0
+        Which "$tmp" && return 0
     done
 
-    Die "ERROR: Not any found in PATH: curl, wget or lynx in PATH"
+    Die "ERROR: Not any found in PATH: curl, wget or lynx"
 }
 
 Main ()
@@ -810,7 +810,7 @@ Main ()
     fi
 }
 
-trap Atexit 0 1 2 3 5 15 19
+trap Atexit 0 1 2 3 15
 Require
 Main "$@"
 
