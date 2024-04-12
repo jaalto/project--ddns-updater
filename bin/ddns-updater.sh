@@ -45,7 +45,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1102"
+VERSION="2024.0412.1107"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -105,6 +105,10 @@ OPTIONS
 
     -L, --log
         Display log file and exit.
+
+    -p, --persistent-data-dir DIR
+        Location where to save variable persistent data.
+        Default: $VARDIR
 
     -s, --status
         Show status and exit.
@@ -709,6 +713,10 @@ Main ()
                 VERBOSE="verbose"
                 TEST="test"
                 ;;
+            -p, --persistent-data-dir)
+                VARDIR=$2
+                shift 2
+                ;;
             -v | --verbose)
                 shift
                 VERBOSE="verbose"
@@ -738,6 +746,9 @@ Main ()
 
     DieEmpty "$CONF" "ERROR: No configuration directory: $CONFHOME"
     DieNoDir "$CONF" "ERROR: No configuration directory: $CONF"
+
+    DieEmpty "$VARDIR" "ERROR: missing --persistent-data-dir DIR"
+    DieNoDir "$VARDIR" "ERROR: No data directory: $VARDIR"
 
     if [ "$lsconf" ]; then
         ConfigFileStatus "$conffiles"
