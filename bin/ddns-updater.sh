@@ -45,7 +45,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1214"
+VERSION="2024.0412.1218"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -91,7 +91,7 @@ do
     fi
 done
 
-VARDIR=$CONF
+LOGDIR=$CONF
 
 # -----------------------------------------------------------------------
 # GLOBAL VARIABLES
@@ -138,8 +138,8 @@ OPTIONS
 
     -p, --persistent-data-dir DIR
         Location where to save variable persistent data
-        like current and uddated Ip addresses. See
-        FILES. Default: $VARDIR
+        like logs and  uddated ip addresses. See
+        FILES. Default: $LOGDIR
 
     -s, --status
         Show status and exit.
@@ -207,9 +207,9 @@ ReadConfig ()
 
 SetLogVariables ()
 {
-    FILE_IP="$VARDIR/$LOG_FILE_PREFIX.now"
-    FILE_LOG="$VARDIR/$LOG_FILE_PREFIX.log"
-    FILE_TIMESTAMP="$VARDIR/$LOG_FILE_PREFIX.updated"
+    FILE_IP="$LOGDIR/$LOG_FILE_PREFIX.now"
+    FILE_LOG="$LOGDIR/$LOG_FILE_PREFIX.log"
+    FILE_TIMESTAMP="$LOGDIR/$LOG_FILE_PREFIX.updated"
 }
 
 Atexit ()
@@ -790,7 +790,7 @@ set -x
                 ;;
             -p | --persistent-data-dir)
                 DieOption "--persistent-data-dir" "$2"
-                VARDIR=$2
+                LOGDIR=$2
                 shift 2
                 ;;
             -v | --verbose)
@@ -834,8 +834,8 @@ set -x
 
     DieEmpty "$conffiles" "ERROR: No live configuration files available"
 
-    DieEmpty "$VARDIR" "ERROR: No VARDIR set or missing --persistent-data-dir DIR"
-    DieNoDir "$VARDIR" "ERROR: No data directory: $VARDIR"
+    DieEmpty "$LOGDIR" "ERROR: No LOGDIR set or missing --persistent-data-dir DIR"
+    DieNoDir "$LOGDIR" "ERROR: No data directory: $LOGDIR"
 
     # -----------------------------------------------------------------------
 
