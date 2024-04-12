@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1045"
+VERSION="2024.0412.1047"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -527,8 +527,8 @@ ServiceRunConfigList ()
     list="$2"
 
     if [ ! "$TEST" ]; then
-        echo $ip > $FILE_IP
-        Date > $FILE_TIMESTAMP
+        echo "$ip" > "$FILE_IP"
+        Date > "$FILE_TIMESTAMP"
     fi
 
     ret=0
@@ -541,10 +541,9 @@ ServiceRunConfigList ()
         status=$?
 
         if [ $status -ne 0 ]; then
-            ret=$?
+            ret=$status
             Verbose "update status FAILED"
         else
-            Verbose
             Verbose "update status ok"
         fi
     done
