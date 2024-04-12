@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1007"
+VERSION="2024.0412.1013"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -54,7 +54,7 @@ PROGRAM=${0##*/}
 TMPDIR=${TMPDIR:-/tmp}
 [ -d "$TMPDIR" ] || TMPDIR=/tmp
 
-TMPBASE=${TMPDIR:-/tmp}/${LOGNAME:-$USER}.tmp.$$
+TMPBASE=${TMPDIR:-/tmp}/${LOGNAME:-$USER}.$$.ddns-updater.tmp
 
 if [ ! "$PATH" ]; then
     PATH="/usr/bin:/usr/local/bin"
@@ -86,60 +86,78 @@ done
 # -----------------------------------------------------------------------
 
 HELP="\
-Synopsis: $0 [option]
-
-DESCRIPTION
-  Updates IP address to DDNS services: duckdns.org and
-  dns.he.net
+Synopsis: $PROGRAM [option]
 
 OPTIONS
-  -c, --config NAME  Read configuration NAME (or path)
-  -f, --force        Force update even if IP is same.
-  -l, --list         List status of configuration files and exit.
-  -L, --log          Display log file and exit.
-  -s, --status       Show status and exit.
-  -S, --syslog       Send status to syslog. Only for root (in cron).
-  -t, --test         Run in test mode. No network update.
-  -v, --verbose      Display verbose messages.
-  -V, --version      Display version information and exit.
-  -h, --help         Display short help.
+    -c, --config NAME
+        Read configuration NAME (or path)
 
-  Please note that stacking of short options is not supported. E.g.
-  -v -f cannot be combined into -vf.
+    -f, --force
+        Force update even if IP is same.
+
+    -l, --list
+        List status of configuration files and exit.
+
+    -L, --log
+        Display log file and exit.
+
+    -s, --status
+        Show status and exit.
+
+    -S, --syslog
+        Send status to syslog. Only for root (in cron).
+
+    -t, --test
+        Run in test mode. No network update.
+
+    -v, --verbose
+        Display verbose messages.
+
+    -V, --version
+        Display version information and exit.
+
+    -h, --help
+        Display short help.
+
+    Please note that stacking of short options is not supported.
+    E.g. -v -f cannot be combined into -vf.
+
+DESCRIPTION
+    Updates IP address to free DDNS services: duckdns.org and
+    dns.he.net
 
 DIRECTORIES
+    CONFDIR Configuration directory searched is one of:
 
-  CONFDIR Configuration directory searched is one of:
-
-  \$HOME/.config/ddns-updater
-  /etc/ddns-updater
+    \$HOME/.config/ddns-updater
+    /etc/ddns-updater
 
 FILES
-  Configuration files:
+    Configuration files:
 
-  $CONF/*.conf
+    $CONF/*.conf
 
-  Program's configuration file (read in this order):
+    Program's configuration file (read in this order):
 
-  /etc/defaults/ddns-updater.conf
-  $HOME/.ddns-updater
+    /etc/defaults/ddns-updater.conf
+    $HOME/.ddns-updater
 
-  Internal files:
+    Internal files:
 
-  $CONF/00.ip            Last update - ip address
-  $CONF/00.log           Last update - error log
-  $CONF/00.updated       Last update - YYYY-MM-DD HH:MM"
+    $CONF/00.ip            Last update - ip address
+    $CONF/00.log           Last update - error log
+    $CONF/00.updated       Last update - YYYY-MM-DD HH:MM"
 
 # -----------------------------------------------------------------------
 # GLOBAL VARIABLES
 # -----------------------------------------------------------------------
 
-LOGGER=    # Syslog support. In debian this is in package bsdutils
+LOGGER=    # Syslog support. Debian: "apt-get install bsdutils"
 
 if [ -x /usr/bin/logger ]; then
     LOGGER=logger
 else
-    tmp=$(which logger 2> /dev/null)
+    tmp=$(command -v logger > /dev/null 2>&1)
     [ "$tmp" ] && LOGGER=$tmp
 fi
 
@@ -159,6 +177,11 @@ WGET_OPTIONS="--timeout=15"
 # -----------------------------------------------------------------------
 # FUNCTIONS
 # -----------------------------------------------------------------------
+
+Help ()
+{
+    echo "$HELP" | sed "s,$HOME,~,g"
+}
 
 Atexit ()
 {
@@ -289,11 +312,6 @@ IpPrevious ()
     cat "$FILE_IP" 2> /dev/null
 }
 
-Help ()
-{
-    echo "$HELP" | sed "s,$HOME,~,g"
-}
-
 ConvertHOME ()
 {
     # Instead of long /mount/some/home/USER, use "~"
@@ -336,14 +354,14 @@ WhatsmyipParse ()
     # <p><code class="ip">81.4.110.124</code></p>
     awk '
     /code class=.*ip/ {
-	 sub("</code>.*","")
-	 sub("^.*>","")
-	 print
-	 exit
+         sub("</code>.*","")
+         sub("^.*>","")
+         print
+         exit
      }
      /^[ \t]*[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/ {
-	 print $1
-	 exit
+         print $1
+         exit
      }
      ' "$@"
 }
