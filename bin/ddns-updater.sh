@@ -45,7 +45,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1139"
+VERSION="2024.0412.1149"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -62,6 +62,8 @@ if [ ! "$PATH" ]; then
 fi
 
 GREP="egrep"
+CURL="curl"
+WEBCALL=   # See Require()
 
 # -----------------------------------------------------------------------
 # CONFIGURATION DIRECRECTORIES
@@ -108,10 +110,6 @@ WGET_OPTIONS="--timeout=15"
 
 # -----------------------------------------------------------------------
 # FUNCTIONS
-# -----------------------------------------------------------------------
-
-# -----------------------------------------------------------------------
-# HELP
 # -----------------------------------------------------------------------
 
 HELP="\
@@ -161,8 +159,10 @@ OPTIONS
     E.g. -v -f cannot be combined into -vf.
 
 DESCRIPTION
-    Updates IP address to free DDNS services: duckdns.org and
-    dns.he.net
+    Updates IP address to free DDNS services:
+
+        duckdns.org
+        dns.he.net
 
 DIRECTORIES
     CONFDIR Configuration directory searched is one of:
@@ -375,11 +375,11 @@ Webcall ()
     # ARGUMENTS: URL [LOGFILE]
     logfile=$2
 
-    echo "Webcall() $*" >> "$FILE_LOG"
+    echo "$PROGRAM: Webcall() $*" >> "$FILE_LOG"
 
     # shell check SC2086: do not check unquoted $VAR
 
-    if Which curl ; then
+    if [ "$WEBCALL" = "curl" ]; then
         if [ "$logfile" ]; then
             # shellcheck disable=SC2086
             ${TEST:+echo} curl --silent --insecure --output "$logfile" $CURL_OPTIONS "$1" 2>> "$FILE_LOG"
@@ -387,7 +387,7 @@ Webcall ()
             # shellcheck disable=SC2086
             ${TEST:+echo} curl --silent --insecure $CURL_OPTIONS "$1" 2>> "$FILE_LOG"
         fi
-    elif Which wget ; then
+    elif [ "$WEBCALL" = "wget" ]; then
         if [ "$logfile" ]; then
             # Filter out the status message
             # shellcheck disable=SC2086
@@ -396,14 +396,14 @@ Webcall ()
             # shellcheck disable=SC2086
             ${TEST:+echo} wget --no-verbose --output-document=- $WGET_OPTIONS "$1" 2>> "$FILE_LOG"
         fi
-    elif Which lynx ; then
+    elif [ "$WEBCALL" = "lynx" ]; then
         if [ "$logfile" ]; then
             lynx --dump "$2" > "$logfile" 2>> "$FILE_LOG"
         else
             lynx --dump "$2" 2>> "$FILE_LOG"
         fi
     else
-        Die "ERROR: Not any programs found in PATH: curl, wget or lynx"
+        Die "ERROR: No programs found in PATH: curl, wget or lynx"
     fi
 }
 
@@ -683,7 +683,10 @@ Require ()
 {
     for tmp in curl wget lynx
     do
-        Which "$tmp" && return 0
+        if Which "$tmp"; then
+            WEBCALL=$tmp
+            return 0
+        fi
     done
 
     Die "ERROR: Not any found in PATH: curl, wget or lynx"
@@ -860,6 +863,7 @@ Main ()
         else
             Echo "No log file $FILE_LOG"
         fi
+
         return 0
     fi
 
