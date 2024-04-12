@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1049"
+VERSION="2024.0412.1051"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -698,12 +698,12 @@ Main ()
             -t | --test | --dry-run)
                 shift
                 Msg "** Running in test mode, no network calls"
-                VERBOSE=verbose
-                TEST=test
+                VERBOSE="verbose"
+                TEST="test"
                 ;;
             -v | --verbose)
                 shift
-                VERBOSE=verbose
+                VERBOSE="verbose"
                 ;;
             -V | --version)
                 shift
@@ -715,11 +715,11 @@ Main ()
                 Help
                 return 0
                 ;;
-            -*) Warn "WARN: Unknown option: $1"
-                shift
-                ;;
             --) shift
                 break
+                ;;
+            -*) Warn "WARN: Unknown option: $1"
+                shift
                 ;;
             *)  break
                 ;;
@@ -763,7 +763,7 @@ Main ()
     if [ "$status" ]; then
         for file in $conffiles
         do
-            Verbose "Conf: $(ConvertHOME $file)"
+            Verbose "Conf: $(ConvertHOME "$file")"
         done
 
         date=$(cat "$FILE_TIMESTAMP" 2> /dev/null)
