@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1042"
+VERSION="2024.0412.1044"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -434,7 +434,7 @@ ServiceStatus ()
     [ "$VERBOSE" ] && cat "$log"
 
     # Noting to check here
-    # shellcheck diable=SC1090
+    # shellcheck disable=SC1090
     . "$file"      # Source configuration file
 
     # Make sure variables got defined
@@ -457,7 +457,7 @@ ServiceStatus ()
         SyslogStatusUpdate good  "DDNS-$id" "$ip"
         return 0
     else
-        SyslogStatusUpdate error "DDNS-$id" "$ip" "$(ReadFileAsString $log)"
+        SyslogStatusUpdate error "DDNS-$id" "$ip" "$(ReadFileAsString "$log")"
         return 1
     fi
 )}
@@ -475,7 +475,7 @@ ServiceRunUpdate ()
         return 0
     fi
 
-    [ "$VERBOSE" ] && cat $log
+    [ "$VERBOSE" ] && cat "$log"
 
     . "$file"       # Source the configuration file
 
