@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1003"
+VERSION="2024.0412.1005"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -82,7 +82,7 @@ do
 done
 
 CONF_PRORRAM="\
-/etc/defaults/ddns-updater.conf \
+/etc/default/ddns-updater.conf \
 $HOME/.ddns-updater"
 
 # -----------------------------------------------------------------------
