@@ -45,7 +45,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1127"
+VERSION="2024.0412.1129"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -716,9 +716,9 @@ Main ()
     do
         case "$1" in
             -c | --config)
-                DieEmpty "$2" "ERROR: Missing arg for --conf"
+                DieOption "--config" "$2"
                 file=$(ConfigFilePath "$2")
-                DieEmpty "$file" "ERROR: No config file found for $1"
+                DieEmpty "$file" "ERROR: No file found for --config $2"
                 conffiles="$conffiles $file"
                 shift 2
                 ;;
@@ -735,6 +735,7 @@ Main ()
                 FORCE=force
                 ;;
             -g | --get-ip)
+                DieOption "--get-ip" "$2"
                 URL_WHATSMYIP=$2
                 shift 2
                 ;;
@@ -757,6 +758,7 @@ Main ()
                 TEST="test"
                 ;;
             -p | --persistent-data-dir)
+                DieOption "--persistent-data-dir" "$2"
                 VARDIR=$2
                 shift 2
                 ;;
