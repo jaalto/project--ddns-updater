@@ -45,7 +45,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1153"
+VERSION="2024.0412.1200"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -96,17 +96,14 @@ LOGGER=    # Syslog support. Debian: "apt-get install bsdutils"
 
 # Use prefix 00.* for files to appear first in ls(1) listing
 
-PREFIX="00.ddns-updater.ip"
-FILE_IP="$VARDIR/$PREFIX.now"
-FILE_LOG="$VARDIR/$PREFIX.log"
-FILE_TIMESTAMP="$VARDIR/$PREFIX.updated"
-
 # Can be set in program's configuration file <program>.conf
 
 URL_WHATSMYIP=ifconfig.co
 MSG_PREFIX="DDNS-UPDATER "
 CURL_OPTIONS="--max-time 15"
 WGET_OPTIONS="--timeout=15"
+
+LOG_FILE_PREFIX="00.ddns-updater.ip"
 
 # -----------------------------------------------------------------------
 # FUNCTIONS
@@ -189,6 +186,13 @@ FILES
 Help ()
 {
     echo "$HELP" | sed "s,$HOME,~,g"
+}
+
+SetLogVariables ()
+{
+    FILE_IP="$VARDIR/$LOG_FILE_PREFIX.now"
+    FILE_LOG="$VARDIR/$LOG_FILE_PREFIX.log"
+    FILE_TIMESTAMP="$VARDIR/$LOG_FILE_PREFIX.updated"
 }
 
 Atexit ()
@@ -488,6 +492,8 @@ ServiceStatus ()
     # shellcheck disable=SC1090
     . "$file"      # Source configuration file
 
+    SetLogVariables # Update location of writable files
+
     # Make sure variables got defined
 
     if [ ! "$REGEXP_OK" ]; then
@@ -696,6 +702,7 @@ Require ()
 Main ()
 {
     Require
+    SetLogVariables
 
     unset TEST
     unset conffiles
