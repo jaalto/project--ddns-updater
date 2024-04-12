@@ -747,9 +747,6 @@ Main ()
     DieEmpty "$CONF" "ERROR: No configuration directory: $CONFHOME"
     DieNoDir "$CONF" "ERROR: No configuration directory: $CONF"
 
-    DieEmpty "$VARDIR" "ERROR: No VARDIR set or missing --persistent-data-dir DIR"
-    DieNoDir "$VARDIR" "ERROR: No data directory: $VARDIR"
-
     if [ "$lsconf" ]; then
         ConfigFileStatus "$conffiles"
         return 0
@@ -760,6 +757,9 @@ Main ()
     fi
 
     DieEmpty "$conffiles" "ERROR: No live configuration files available"
+
+    DieEmpty "$VARDIR" "ERROR: No VARDIR set or missing --persistent-data-dir DIR"
+    DieNoDir "$VARDIR" "ERROR: No data directory: $VARDIR"
 
     # -----------------------------------------------------------------------
 
