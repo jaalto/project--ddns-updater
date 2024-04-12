@@ -45,7 +45,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1057"
+VERSION="2024.0412.1102"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -83,6 +83,8 @@ do
         CONF=$dir
     fi
 done
+
+VARDIR=$CONF
 
 # -----------------------------------------------------------------------
 # HELP
@@ -147,9 +149,9 @@ FILES
 
     Internal files:
 
-    $CONF/00.ip            Last update - ip address
-    $CONF/00.log           Last update - error log
-    $CONF/00.updated       Last update - YYYY-MM-DD HH:MM"
+    $VARDIR/00.ip            Last update - ip address
+    $VARDIR/00.log           Last update - error log
+    $VARDIR/00.updated       Last update - YYYY-MM-DD HH:MM"
 
 # -----------------------------------------------------------------------
 # GLOBAL VARIABLES
@@ -159,9 +161,9 @@ LOGGER=    # Syslog support. Debian: "apt-get install bsdutils"
 
 # Use prefix 00.* for files to appear first in ls(1) listing
 
-FILE_IP="$CONF/00.ip"
-FILE_LOG="$CONF/00.log"
-FILE_TIMESTAMP="$CONF/00.updated"
+FILE_IP="$VARDIR/00.ip"
+FILE_LOG="$VARDIR/00.log"
+FILE_TIMESTAMP="$VARDIR/00.updated"
 
 # Can be set in program's configuration file <program>.conf
 
@@ -187,6 +189,11 @@ Atexit ()
 Version ()
 {
     echo "$VERSION $LICENSE $AUTHOR $HOMEPAGE"
+}
+
+IsUSerRoot ()
+{
+    [ "$(id --user)" = "0" ]
 }
 
 Verbose ()
