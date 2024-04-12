@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1021"
+VERSION="2024.0412.1022"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -314,7 +314,7 @@ IpPrevious ()
 ConvertHOME ()
 {
     # Instead of long /mount/some/home/USER, use "~"
-    echo $1 | sed "s,$HOME,~,"
+    echo "$1" | sed "s,$HOME,~,"
 }
 
 Webcall ()
