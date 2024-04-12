@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.0955"
+VERSION="2024.0412.0957"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -52,7 +52,9 @@ PROGRAM=ddns-updater
 
 # mktemp(1) would be an external program
 TMPDIR=${TMPDIR:-/tmp}
-TMPBASE=$TMPDIR/$PROGRAM.$$
+[ -d "$TMPDIR" ] || TMPDIR=/tmp
+
+TMPBASE=${TMPDIR:-/tmp}/${LOGNAME:-$USER}.tmp.$$
 
 if [ ! "$PATH" ]; then
     PATH="/usr/bin:/usr/local/bin"
@@ -585,9 +587,9 @@ Require ()
 Main ()
 {
     unset TEST
-    conffiles=
+    unset conffiles
+    unset showlog
     tmpmain="$TMPBASE.Main"
-    showlog=
 
     while :
     do
@@ -684,7 +686,7 @@ Main ()
 
     ip_prev=$(IpPrevious)
 
-    IpCurrent > "$tmpmain"     # Might call exit. Can't subshell $()
+    IpCurrent > "$tmpmain"     # Might call exit. Can't use $()
     ip=$(cat "$tmpmain")
 
     Verbose "IP old: $ip_prev"
