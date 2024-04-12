@@ -45,7 +45,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1109"
+VERSION="2024.0412.1110"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -713,7 +713,7 @@ Main ()
                 VERBOSE="verbose"
                 TEST="test"
                 ;;
-            -p, --persistent-data-dir)
+            -p | --persistent-data-dir)
                 VARDIR=$2
                 shift 2
                 ;;
