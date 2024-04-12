@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1022"
+VERSION="2024.0412.1023"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -370,7 +370,7 @@ Whatsmyip ()
     tmpwhatsmyip="$TMPBASE.whatsmyip"
 
     # Can't use pipe. Might call Die()
-    Webcall $URL_WHATSMYIP > "$tmpwhatsmyip"
+    Webcall "$URL_WHATSMYIP" > "$tmpwhatsmyip"
 
     [ -s "$tmpwhatsmyip" ] || return 1
 
