@@ -45,7 +45,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1110"
+VERSION="2024.0412.1113"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -675,13 +675,12 @@ Main ()
     while :
     do
         case "$1" in
-            -c | --conf | --config)
-                shift
-                [ "$1" ] || Die "ERROR: Missing arg for --conf"
-                file=$(ConfigFilePath "$1")
-                [ "$file" ] || Die "ERROR: No config file found for $1"
-                shift
+            -c | --config)
+                DieEmpty "$2" "ERROR: Missing arg for --conf"
+                file=$(ConfigFilePath "$2")
+                DieEmpty "$file" "ERROR: No config file found for $1"
                 conffiles="$conffiles $file"
+                shift 2
                 ;;
             -l | --list)
                 shift
