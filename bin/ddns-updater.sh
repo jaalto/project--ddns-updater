@@ -45,7 +45,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1218"
+VERSION="2024.0412.1237"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -130,6 +130,9 @@ OPTIONS
         A URL to return current IP address.
         Default: $URL_WHATSMYIP
 
+    -i, --ip, --whatsmyip
+        Call $URL_WHATSMYIP, display current IP and exit.
+
     -l, --list
         List status of configuration files and exit.
 
@@ -147,11 +150,11 @@ OPTIONS
     -S, --syslog
         Send status to syslog. Only for root (in cron).
 
-    -t, --test
-        Run in test mode. No network update.
-
     -v, --verbose
         Display verbose messages.
+
+    -t, --test
+        Run in test mode. No network update.
 
     -V, --version
         Display version information and exit.
@@ -167,6 +170,11 @@ DESCRIPTION
 
         duckdns.org
         dns.he.net
+
+EXAMPLES
+    For testing, display IP and exit
+
+        $PROGRAM --ip
 
 DIRECTORIES
     CONFDIR Configuration directory searched is one of:
@@ -430,18 +438,36 @@ Webcall ()
 
 WhatsmyipParse ()
 {
+    # Strip HTML
     # <p><code class="ip">81.4.110.124</code></p>
+
+cat $1
     awk '
-    /code class=.*ip/ {
+    BEGIN {
+        # GNU awk specific option.
+        # Just helping here. No-op if not supported.
+        IGNORECASE = 1
+    }
+    /<code class=.*ip/ {
          sub("</code>.*","")
          sub("^.*>","")
-         print
-         exit
+         ip = $0
      }
      /^[ \t]*[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/ {
-         print $1
-         exit
+         ip = $1
      }
+
+     ip {
+        $0 = ip
+
+        # Trim whitespaces
+        sub("^[ \t]+","")
+        sub("[ \t]+$","")
+
+        print
+        exit
+     }
+
      ' "$@"
 }
 
@@ -719,7 +745,6 @@ Require ()
 Main ()
 {
     Require
-set -x
     ReadConfig
     SetLogVariables
 
@@ -753,6 +778,11 @@ set -x
                 conffiles="$conffiles $file"
                 shift 2
                 ;;
+            -i | --ip | --whatsmyip)
+                shift
+                IpCurrent
+                return 0
+                ;;
             -l | --list)
                 shift
                 lsconf=lsconf
@@ -782,16 +812,16 @@ set -x
                     Warn "ERROR: logger(1) not found in PATH. Syslog not available."
                 fi
                 ;;
+            -p | --persistent-data-dir)
+                DieOption "--persistent-data-dir" "$2"
+                LOGDIR=$2
+                shift 2
+                ;;
             -t | --test | --dry-run)
                 shift
                 Msg "** Running in test mode, no network calls"
                 VERBOSE="verbose"
                 TEST="test"
-                ;;
-            -p | --persistent-data-dir)
-                DieOption "--persistent-data-dir" "$2"
-                LOGDIR=$2
-                shift 2
                 ;;
             -v | --verbose)
                 shift
