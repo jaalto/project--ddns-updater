@@ -33,18 +33,19 @@
 #         It is not defined in POSIX /bin/sh although almost
 #         all linux shells have added the support. Some routers
 #         still may have older shells.
+#       - Lint by https://www.shellcheck.net
 #
-#      Note: program cannot expect to have GNU utilities and
-#      their options. This means using:
+#      Note: This program is designed to not expect to have GNU
+#      utilities and their options. This means writing:
 #
 #           egrep ...  /dev/null 2>&1
 #
-#       Instead of calls like:
+#       Instead of:
 #
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1054"
+VERSION="2024.0412.1057"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
