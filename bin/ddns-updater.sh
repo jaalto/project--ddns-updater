@@ -45,7 +45,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1200"
+VERSION="2024.0412.1214"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -65,8 +65,13 @@ GREP="egrep"
 CURL="curl"
 WEBCALL=   # See Require()
 
+CONF_PRORRAM="\
+etc/default/ddns-updater.conf \
+$HOME/.config/ddns-updater/ddns-updater.conf \
+$HOME/.ddns-updater.conf"
+
 # -----------------------------------------------------------------------
-# CONFIGURATION DIRECRECTORIES
+# CONFIGURATION DIRECRECTORIES DOR DDNS SERVICE
 # -----------------------------------------------------------------------
 
 # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
@@ -109,7 +114,9 @@ LOG_FILE_PREFIX="00.ddns-updater.ip"
 # FUNCTIONS
 # -----------------------------------------------------------------------
 
-HELP="\
+Help ()
+{
+    HELP="\
 Synopsis: $PROGRAM [option]
 
 OPTIONS
@@ -168,24 +175,34 @@ DIRECTORIES
     /etc/ddns-updater
 
 FILES
-    Read configuration files:
+    Program's main configuration file (read in this order):
 
-    $CONF/*.conf
+        $CONF_PRORRAM
 
-    Written files:
+    DDNS service specific configuration files:
 
-    $FILE_IP
+        $CONF/*.conf
+
+    Log files written:
+
         Last update - ip address
+        $FILE_IP
 
-    $FILE_LOG
-        Last update - error log
+        Last update - action log
+        $FILE_LOG
 
-    $FILE_TIMESTAMP
-        Last update - YYYY-MM-DD HH:MM"
+        Last update - YYYY-MM-DD HH:MM
+        $FILE_TIMESTAMP"
 
-Help ()
-{
     echo "$HELP" | sed "s,$HOME,~,g"
+}
+
+ReadConfig ()
+{
+    for tmp in $CONF_PRORRAM
+    do
+        [ -s "$tmp" ] && . "$tmp"
+    done
 }
 
 SetLogVariables ()
@@ -702,6 +719,8 @@ Require ()
 Main ()
 {
     Require
+set -x
+    ReadConfig
     SetLogVariables
 
     unset TEST
