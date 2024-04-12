@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1031"
+VERSION="2024.0412.1033"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -200,7 +200,7 @@ Msg ()
 
 Warn ()
 {
-    Msg "$PROGRAM $*" >&2
+    Msg "$*" >&2
 }
 
 Die ()
@@ -641,7 +641,8 @@ Main ()
         if grep --version 2> /dev/null | grep "GNU" > /dev/null; then
             GREP="grep --extended-regexp"
         else
-            Verbose "WARN: egrep not in PATH, switching 'grep -E' (please install GNU grep if this does not work)"
+            Verbose "WARN: egrep not in PATH, switching 'grep -E'" \
+                    "(please install GNU grep if this does not work)"
         fi
     fi
 
