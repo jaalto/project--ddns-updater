@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1013"
+VERSION="2024.0412.1016"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -153,13 +153,6 @@ FILES
 # -----------------------------------------------------------------------
 
 LOGGER=    # Syslog support. Debian: "apt-get install bsdutils"
-
-if [ -x /usr/bin/logger ]; then
-    LOGGER=logger
-else
-    tmp=$(command -v logger > /dev/null 2>&1)
-    [ "$tmp" ] && LOGGER=$tmp
-fi
 
 # Use prefix 00.* for files to appear first in ls(1) listing
 
@@ -633,6 +626,14 @@ Main ()
     unset conffiles
     unset showlog
     tmpmain="$TMPBASE.Main"
+
+    # Optional feature
+
+    if [ -x /usr/bin/logger ]; then
+        LOGGER=logger
+    elif Which logger; then
+        LOGGER=logger
+    fi
 
     while :
     do
