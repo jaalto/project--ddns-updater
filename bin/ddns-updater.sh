@@ -392,7 +392,7 @@ IpCurrent ()
 
 ServiceLogFile ()
 {
-    echo ${1%.conf}.log
+    echo "${1%.conf}.log"
 }
 
 ServiceId ()
