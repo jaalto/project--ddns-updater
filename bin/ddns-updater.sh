@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.0958"
+VERSION="2024.0412.1000"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -193,6 +193,35 @@ Die ()
 {
     Warn "$*"
     exit 1
+}
+
+DieEmpty ()
+{
+    [ "$1" ] && return 0
+
+    shift
+    Die "$*"
+}
+
+DieNoFile ()
+{
+    if [ ! -e "$1" ]; then
+        Die "$PROGRAM ERROR: no such file: $1"
+    fi
+}
+
+DieEmptyFile ()
+{
+    if [ ! -s "$1" ]; then
+        Die "$PROGRAM ERROR: empty file: $1"
+    fi
+}
+
+DieNoDir ()
+{
+    if [ ! -d "$1" ]; then
+        Die "$PROGRAM ERROR: no such dir: $1"
+    fi
 }
 
 Which ()
