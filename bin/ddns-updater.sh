@@ -652,6 +652,8 @@ Require ()
 
 Main ()
 {
+    Require
+
     unset TEST
     unset conffiles
     unset showlog
@@ -829,7 +831,6 @@ Main ()
 }
 
 trap Atexit 0 1 2 3 15
-Require
 Main "$@"
 
 # End of file
