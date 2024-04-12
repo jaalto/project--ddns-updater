@@ -45,7 +45,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1150"
+VERSION="2024.0412.1153"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -514,8 +514,9 @@ ServiceStatus ()
 )}
 
 ServiceRunUpdate ()
-{(  # Run in a subshell.
-    # Isolate program from variables introduced by "sourcing"
+{(
+    # Run in a subshell which isolates program from setting
+    # variables in config file.
 
     ip=$1
     file=$2
