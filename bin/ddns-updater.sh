@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1000"
+VERSION="2024.0412.1003"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -186,7 +186,7 @@ Msg ()
 
 Warn ()
 {
-    Msg "$*" >&2
+    Msg "$PROGRAM $*" >&2
 }
 
 Die ()
@@ -231,7 +231,7 @@ Which ()
     return 0
 }
 
-EmptyFile ()
+MakeEmptyFile ()
 {
     : > "$1"   # The True operator. An echo would add a newline.
 }
@@ -688,13 +688,8 @@ Main ()
 
     # -----------------------------------------------------------------------
 
-    if [ ! "$CONF" ] ; then
-        Die "ERROR: No configuration directory: $CONFHOME"
-    fi
-
-    if [ ! -d "$CONF" ]; then
-        Die "ERROR: No configuration directory: $CONF"
-    fi
+    DieEmpty "$CONF" "ERROR: No configuration directory: $CONFHOME"
+    DieNoDir "$CONF" "ERROR: No configuration directory: $CONF"
 
     if [ "$lsconf" ]; then
         ConfigFileStatus "$conffiles"
@@ -705,13 +700,11 @@ Main ()
         conffiles=$(ConfiFileList)
     fi
 
-    if [ ! "$conffiles" ]; then
-        Die "ERROR: No live configuration files available"
-    fi
+    DieEmpty "$conffiles" "ERROR: No live configuration files available"
 
     # -----------------------------------------------------------------------
 
-    EmptyFile "$FILE_LOG"
+    MakeEmptyFile "$FILE_LOG"
 
     ip_prev=$(IpPrevious)
 
