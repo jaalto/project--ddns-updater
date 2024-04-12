@@ -45,7 +45,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1149"
+VERSION="2024.0412.1150"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -375,7 +375,7 @@ Webcall ()
     # ARGUMENTS: URL [LOGFILE]
     logfile=$2
 
-    echo "$PROGRAM: Webcall() $*" >> "$FILE_LOG"
+    echo "Webcall() $*" >> "$FILE_LOG"
 
     # shell check SC2086: do not check unquoted $VAR
 
