@@ -44,7 +44,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1033"
+VERSION="2024.0412.1034"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -648,11 +648,7 @@ Main ()
 
     # Optional feature
 
-    if [ -x /usr/bin/logger ]; then
-        LOGGER=logger
-    elif Which logger; then
-        LOGGER=logger
-    fi
+    Which logger && LOGGER=logger
 
     while :
     do
