@@ -477,6 +477,8 @@ ServiceRunUpdate ()
 
     [ "$VERBOSE" ] && cat "$log"
 
+    # Noting to check here
+    # shellcheck disable=SC1090
     . "$file"       # Source the configuration file
 
     # Make sure variables got defined
