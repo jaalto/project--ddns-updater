@@ -636,8 +636,6 @@ Require ()
     done
 
     Die "ERROR: Not any found in PATH: curl, wget or lynx in PATH"
-
-    unset tmp
 }
 
 Main ()
