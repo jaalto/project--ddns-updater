@@ -52,7 +52,7 @@
 #           bsdutils
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0711.0900"
+VERSION="2024.0711.0909"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -311,14 +311,14 @@ DieNoFile ()
 DieEmptyFile ()
 {
     if [ ! -s "$1" ]; then
-        Die "$PROGRAM ERROR: empty file: $1"
+        Die "$2"
     fi
 }
 
 DieNoDir ()
 {
     if [ ! -d "$1" ]; then
-        Die "$PROGRAM ERROR: no such dir: $1"
+        Die "$2"
     fi
 }
 
@@ -358,6 +358,12 @@ DieOption ()
 MakeEmptyFile ()
 {
     : > "$1"   # The True operator. An echo would add a newline.
+}
+
+DieNoLogdir ()
+{
+    DieEmpty "$LOGDIR" "ERROR: No LOGDIR set or missing --persistent-data-dir DIR"
+    DieNoDir "$LOGDIR" "ERROR: No LOGDIR data directory: $LOGDIR"
 }
 
 SyslogStatusWrite ()
@@ -810,6 +816,7 @@ Main ()
                 ;;
             -i | --ip | --whatsmyip)
                 shift
+                DieNoLogdir
                 IpCurrent
                 return 0
                 ;;
@@ -881,6 +888,8 @@ Main ()
 
     # -----------------------------------------------------------------------
 
+    DieNoLogdir
+
     DieEmpty "$CONF" "ERROR: No configuration directory: $CONFHOME"
     DieNoDir "$CONF" "ERROR: No configuration directory: $CONF"
 
@@ -894,9 +903,6 @@ Main ()
     fi
 
     DieEmpty "$conffiles" "ERROR: No live configuration files available"
-
-    DieEmpty "$LOGDIR" "ERROR: No LOGDIR set or missing --persistent-data-dir DIR"
-    DieNoDir "$LOGDIR" "ERROR: No data directory: $LOGDIR"
 
     # -----------------------------------------------------------------------
 
