@@ -52,7 +52,7 @@
 #           bsdutils
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0711.0913"
+VERSION="2024.0711.0924"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -124,7 +124,9 @@ LOGGER=    # Syslog support. Debian: apt-get install bsdutils
 URL_WHATSMYIP=ifconfig.co
 MSG_PREFIX="DDNS-UPDATER "
 CURL_OPTIONS="--max-time 15"
+
 WGET_OPTIONS="--timeout=15"
+WGET_UA="--user-agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0'"
 
 LOG_FILE_PREFIX="00.ddns-updater.ip"
 
@@ -456,10 +458,10 @@ Webcall ()
         if [ "$logfile" ]; then
             # Filter out the status message
             # shellcheck disable=SC2086
-            ${TEST:+echo} wget --no-verbose --output-document="$logfile" $WGET_OPTIONS "$1" 2>> "$FILE_LOG"
+            ${TEST:+echo} wget --no-verbose --output-document="$logfile" $WGET_UA $WGET_OPTIONS "$1" 2>> "$FILE_LOG"
         else
             # shellcheck disable=SC2086
-            ${TEST:+echo} wget --no-verbose --output-document=- $WGET_OPTIONS "$1" 2>> "$FILE_LOG"
+            ${TEST:+echo} wget --no-verbose --output-document=- $WGET_UA $WGET_OPTIONS "$1" 2>> "$FILE_LOG"
         fi
     elif [ "$WEBCALL" = "lynx" ]; then
         if [ "$logfile" ]; then
