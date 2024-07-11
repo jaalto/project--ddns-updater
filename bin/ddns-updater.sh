@@ -52,7 +52,7 @@
 #           bsdutils
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0711.0855"
+VERSION="2024.0711.0857"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -92,12 +92,12 @@ $HOME/.ddns-updater.conf"
 
 # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 
-CONF_DEFAULT=$HOME/.config/ddns-updater
+CONFHOME_DEFAULT=$HOME/.config/ddns-updater
 
 if [ "$XDG_CONFIG_HOME" ]; then
     CONFHOME=$XDG_CONFIG_HOME/ddns-updater
 else
-    CONFHOME=$CONF_DEFAULT
+    CONFHOME=$CONFHOME_DEFAULT
 fi
 
 CONF=
@@ -137,7 +137,7 @@ Help ()
     logdir=
 
     if [ ! "$LOGDIR" ]; then
-        logdir=$CONF_DEFAULT
+        logdir=$CONFHOME_DEFAULT
     fi
 
     HELP="\
@@ -221,7 +221,7 @@ FILES
 
     DDNS service specific configuration files:
 
-        ${CONF:-$CONF_DEFAULT}/*.conf
+        ${CONF:-$CONFHOME_DEFAULT}/*.conf
 
     Log files:
 
