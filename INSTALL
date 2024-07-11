@@ -18,7 +18,7 @@ MINIMAL MANUAL INSTALL
    install.sh
 
    1. Copy executable
-      ln -srf bin/ddns-updater.sh /usr/local/bin//ddns-updater
+      ln -srf bin/ddns-updater.sh /usr/local/bin/ddns-updater
 
    2. Copy configuration templates *.conf
       E.g. under ~/.config/ddns-updater
