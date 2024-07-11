@@ -52,7 +52,7 @@
 #           bsdutils
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0711.0909"
+VERSION="2024.0711.0913"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -817,7 +817,9 @@ Main ()
             -i | --ip | --whatsmyip)
                 shift
                 DieNoLogdir
-                IpCurrent
+                if ! IpCurrent ; then
+                    Warn "Failed to get ip from URL_WHATSMYIP: $URL_WHATSMYIP"
+                fi
                 return 0
                 ;;
             -l | --list)
