@@ -23,6 +23,12 @@ MINIMAL MANUAL INSTALL
    2. Copy configuration templates *.conf
       E.g. under ~/.config/ddns-updater
 
+   See cron:
+
+     cron.d/ddns-updater
+
+     install -m 755 cron.d/ddns-updater /etc/cron.d
+
 INSTALL CONFIGURATION TEMPLATES
 
    # Edit after copying and enable each one manually
