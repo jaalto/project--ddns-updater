@@ -52,7 +52,7 @@
 #           bsdutils
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0711.0931"
+VERSION="2024.0711.0935"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -479,7 +479,6 @@ WhatsmyipParse ()
     # Strip HTML
     # <p><code class="ip">81.4.110.124</code></p>
 
-cat $1
     awk '
     BEGIN {
         # GNU awk specific option.
