@@ -45,7 +45,7 @@
 #           grep --extended-regexp --quiet ...
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0412.1237"
+VERSION="2024.0711.0620"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -65,8 +65,8 @@ GREP="egrep"
 CURL="curl"
 WEBCALL=   # See Require()
 
-CONF_PRORRAM="\
-etc/default/ddns-updater.conf \
+CONF_PROGRAM="\
+/etc/default/ddns-updater.conf \
 $HOME/.config/ddns-updater/ddns-updater.conf \
 $HOME/.ddns-updater.conf"
 
@@ -76,10 +76,12 @@ $HOME/.ddns-updater.conf"
 
 # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
 
+CONF_DEFAULT=$HOME/.config/ddns-updater
+
 if [ "$XDG_CONFIG_HOME" ]; then
     CONFHOME=$XDG_CONFIG_HOME/ddns-updater
 else
-    CONFHOME=$HOME/.config/ddns-updater
+    CONFHOME=$CONF_DEFAULT
 fi
 
 CONF=
@@ -90,8 +92,6 @@ do
         CONF=$dir
     fi
 done
-
-LOGDIR=$CONF
 
 # -----------------------------------------------------------------------
 # GLOBAL VARIABLES
@@ -116,6 +116,14 @@ LOG_FILE_PREFIX="00.ddns-updater.ip"
 
 Help ()
 {
+    conf_program=$(echo "$CONF_PROGRAM" | sed 's, ,\n        ,g')
+
+    logdir=
+
+    if [ ! "$LOGDIR" ]; then
+        logdir=$CONF_DEFAULT
+    fi
+
     HELP="\
 Synopsis: $PROGRAM [option]
 
@@ -142,7 +150,7 @@ OPTIONS
     -p, --persistent-data-dir DIR
         Location where to save variable persistent data
         like logs and  uddated ip addresses. See
-        FILES. Default: $LOGDIR
+        FILES. Default: ${LOGDIR:-$logdir}
 
     -s, --status
         Show status and exit.
@@ -176,6 +184,14 @@ EXAMPLES
 
         $PROGRAM --ip
 
+    Display status
+
+        $PROGRAM --status
+
+    Display log
+
+        $PROGRAM --log
+
 DIRECTORIES
     CONFDIR Configuration directory searched is one of:
 
@@ -185,19 +201,19 @@ DIRECTORIES
 FILES
     Program's main configuration file (read in this order):
 
-        $CONF_PRORRAM
+        $conf_program
 
     DDNS service specific configuration files:
 
-        $CONF/*.conf
+        ${CONF:-$CONF_DEFAULT}/*.conf
 
-    Log files written:
+    Log files:
 
         Last update - ip address
-        $FILE_IP
+        $logdir$FILE_IP
 
         Last update - action log
-        $FILE_LOG
+        $logdir$FILE_LOG
 
         Last update - YYYY-MM-DD HH:MM
         $FILE_TIMESTAMP"
@@ -207,7 +223,7 @@ FILES
 
 ReadConfig ()
 {
-    for tmp in $CONF_PRORRAM
+    for tmp in $CONF_PROGRAM
     do
         [ -s "$tmp" ] && . "$tmp"
     done
