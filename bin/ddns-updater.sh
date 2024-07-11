@@ -52,7 +52,7 @@
 #           bsdutils
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0711.0924"
+VERSION="2024.0711.0931"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -877,6 +877,12 @@ Main ()
             -h | --help)
                 shift
                 Help
+                return 0
+                ;;
+            --debug-ip-parse)       # DEVEL OPTION. NOT DOCUMENTED
+                # After wget(1) etc save output to file
+                # Check if IP can be parsed
+                WhatsmyipParse "$2"
                 return 0
                 ;;
             --) shift
