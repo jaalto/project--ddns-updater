@@ -52,7 +52,7 @@
 #           bsdutils
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0711.0857"
+VERSION="2024.0711.0858"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -109,6 +109,8 @@ do
     fi
 done
 
+LOGDIR=${CONFHOME:-$CONFHOME_DEFAULT}
+
 # -----------------------------------------------------------------------
 # GLOBAL VARIABLES
 # -----------------------------------------------------------------------
@@ -133,12 +135,6 @@ LOG_FILE_PREFIX="00.ddns-updater.ip"
 Help ()
 {
     conf_program=$(echo "$CONF_PROGRAM" | sed 's, ,\n        ,g')
-
-    logdir=
-
-    if [ ! "$LOGDIR" ]; then
-        logdir=$CONFHOME_DEFAULT
-    fi
 
     HELP="\
 Synopsis: $PROGRAM [option]
@@ -166,7 +162,7 @@ OPTIONS
     -p, --persistent-data-dir DIR
         Location where to save variable persistent data
         like logs and uddated ip addresses. See
-        FILES. Default: ${LOGDIR:-$logdir}
+        FILES. Default: $LOGDIR
 
     -s, --status
         Show status and exit.
@@ -226,10 +222,10 @@ FILES
     Log files:
 
         Last update - ip address
-        $logdir$FILE_IP
+        $FILE_IP
 
         Last update - action log
-        $logdir$FILE_LOG
+        $FILE_LOG
 
         Last update - YYYY-MM-DD HH:MM
         $FILE_TIMESTAMP"
