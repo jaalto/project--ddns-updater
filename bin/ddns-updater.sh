@@ -23,7 +23,9 @@
 #
 #       Dynamic DNS (DDNS) update client.
 #
-#       See --help. Configuration files must exist before use.
+#       See --help
+#
+#       Configuration files must exist before use.
 #
 #   Style Guide
 #
@@ -35,17 +37,22 @@
 #         still may have older shells.
 #       - Lint by https://www.shellcheck.net
 #
-#      Note: This program is designed to not expect to have GNU
-#      utilities and their options. This means writing:
+#       This program is designed to not expect GNU utilities
+#       and their options. This means writing:
 #
 #           egrep ...  /dev/null 2>&1
 #
 #       Instead of:
 #
 #           grep --extended-regexp --quiet ...
+#   Notes
+#
+#       To use syslog for log messages, in Debian install package:
+#
+#           bsdutils
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0711.0620"
+VERSION="2024.0711.0851"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -62,6 +69,15 @@ if [ ! "$PATH" ]; then
 fi
 
 GREP="egrep"
+
+case "$(grep --version 2> /dev/null)" in
+    *GNU*)
+        # Use of 'egrep' is deprecated. In some systems,
+        # like Cygwin, 'egrep' is a shell script
+        # displaying a warning
+        GREP="grep --extended-regexp"
+esac
+
 CURL="curl"
 WEBCALL=   # See Require()
 
@@ -97,7 +113,7 @@ done
 # GLOBAL VARIABLES
 # -----------------------------------------------------------------------
 
-LOGGER=    # Syslog support. Debian: "apt-get install bsdutils"
+LOGGER=    # Syslog support. Debian: apt-get install bsdutils
 
 # Use prefix 00.* for files to appear first in ls(1) listing
 
@@ -149,7 +165,7 @@ OPTIONS
 
     -p, --persistent-data-dir DIR
         Location where to save variable persistent data
-        like logs and  uddated ip addresses. See
+        like logs and uddated ip addresses. See
         FILES. Default: ${LOGDIR:-$logdir}
 
     -s, --status
@@ -255,6 +271,7 @@ Which ()
 {
     # "command -v" is POSIX
     command -v "$1" > /dev/null 2>&1 || return 1
+
     return 0
 }
 
@@ -780,7 +797,7 @@ Main ()
         fi
     fi
 
-    # Optional feature
+    # Optional feature: syslog support
 
     Which logger && LOGGER="logger"
 
