@@ -52,7 +52,7 @@
 #           bsdutils
 
 AUTHOR="Jari Aalto <jari.aalto@cante.net>"
-VERSION="2024.0711.0858"
+VERSION="2024.0711.0900"
 LICENSE="GPL-2+"
 HOMEPAGE="https://github.com/jaalto/project--ddns-updater"
 
@@ -211,7 +211,8 @@ DIRECTORIES
     /etc/ddns-updater
 
 FILES
-    Program's main configuration file (read in this order):
+    Program's main configuration file. First
+    one found is used:
 
         $conf_program
 
