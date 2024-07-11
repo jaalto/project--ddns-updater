@@ -8,11 +8,20 @@ Requires
 
 SYSTEM WIDE
 
+   Uses /etc for configuration files
+
    make install
 
 MINIMAL MANUAL INSTALL
 
-   See install.sh
+   See documentation at the beginning of
+   install.sh
+
+   1. Copy executable
+      ln -srf bin/ddns-updater.sh /usr/local/bin
+
+   2. Copy configuration templates *.conf
+      E.g. under ~/.config/ddns-updater
 
 INSTALL CONFIGURATION TEMPLATES
 
