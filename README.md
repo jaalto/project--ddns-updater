@@ -1,11 +1,9 @@
-..  comment: the source is maintained in ReST format.
-    Emacs: http://docutils.sourceforge.net/tools/editors/emacs/rst.el
-    Manual: http://docutils.sourceforge.net/docs/user/rst/quickref.html
-
-DESCRIPTION
-===========
+# DESCRIPTION
 
 A generic dynamic DNS (DDNS) update client implemented in POSIX shell.
+
+Project homepage (bugs and source) is at
+https://github.com/jaalto/project--ddns-updater
 
 Any DDNS service provider providing HTTP or HTTPS update can be added.
 The update information can be found their API documention. Program
@@ -15,10 +13,9 @@ includes few ready templates to start with:
 - http://duckdns.org [2] (US, free third level domains)
 - http://dsnss.de    [3] (EU, free third level domains)
 
-See the examples/ directory.
+See the `examples/` directory.
 
-How does it work?
------------------
+## How does it work?
 
 Based on configured domains and credentials, the program periodically
 checks if IP address has changed and sends update requests. for each
@@ -39,27 +36,23 @@ line to seed the initial IP. After that cron takes care of updates. ::
 
     /usr/local/bin/ddns-updater --verbose
 
-REQUIREMENTS
-============
+# REQUIREMENTS
 
 1. POSIX environment and standard utilities (grep, awk...)
 
-2. POSIX ``/bin/sh`` and web client like ``curl(1)`` or ``wget(1)``.
+2. POSIX `/bin/sh` and web client like `curl(1)` or `wget(1)`.
 
-INSTALL
-=======
+# INSTALL
 
 See details in separate INSTALL file.
 
-REFERENCES
-==========
+# REFERENCES
 
 - [1] Hurricane Electric https://dns.he.net/docs.html
 - [2] https://www.duckdns.org/spec.jsp
 - [3] https://ddnss.de/ua/help.php
 
-COPYRIGHT AND LICENSE
-=====================
+# COPYRIGHT AND LICENSE
 
 Copyright (C) 2019-2025 Jari Aalto <jari.aalto@cante.net>
 
@@ -67,7 +60,4 @@ This project is free; you can redistribute and/or modify it under
 the terms of GNU General Public license either version 2 of the
 License, or (at your option) any later version.
 
-Project homepage (bugs and source) is at
-https://github.com/jaalto/project--ddns-updater
-
-.. End of file
+End of file
