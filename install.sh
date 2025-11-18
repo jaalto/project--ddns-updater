@@ -38,17 +38,17 @@ Run ()
     fi
 }
 
-Run mkdir --parents $BINDIR
-Run cp --verbose bin/ddns-updater.sh $BINDIR/ddns-updater
-Run chmod 755 $BINDIR/ddns-updater
+Run mkdir --parents "$BINDIR"
+Run cp --verbose bin/ddns-updater.sh "$BINDIR/ddns-updater"
+Run chmod 755 "$BINDIR/ddns-updater"
 
 file=ddns-updater.conf
-CONFDIR=${CONFDIR:-$HOME/.config/ddns-updater}
+CONFDIR="${CONFDIR:-$HOME/.config/ddns-updater}"
 
-Run mkdir --parents $CONFDIR
+Run mkdir --parents "$CONFDIR"
 
 if [ ! -f "$CONFDIR/$file" ]; then
-    Run cp --verbose conf/*.conf examples/*.conf $CONFDIR/
+    Run cp --verbose conf/*.conf examples/*.conf "$CONFDIR/"
 fi
 
 case "$BINDIR" in
